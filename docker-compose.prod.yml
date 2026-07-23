@@ -1,0 +1,52 @@
+# Production overrides. Use together with the base compose file:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# All secrets are read from the host environment (a .env file or your
+# orchestrator's secret store) — nothing sensitive lives in this file.
+# Required host env vars (see .env.prod.example):
+#   POSTGRES_PASSWORD, MONGO_PASSWORD, RABBITMQ_USER, RABBITMQ_PASSWORD,
+#   IDS_NEXTAPP_SECRET, IDS_SIGNING_CERT_PATH, IDS_SIGNING_CERT_PASSWORD,
+#   BID_LEDGER_KEY_PEM
+services:
+  postgres:
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+
+  mongodb:
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER:-root}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD:?set MONGO_PASSWORD}
+    ports: []          # do not expose the database to the host in production
+
+  identity-svc:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Server=postgres:5432;User Id=postgres;Password=${POSTGRES_PASSWORD};Database=identity
+      - IdentityServer__Clients__nextApp__Secret=${IDS_NEXTAPP_SECRET:?set IDS_NEXTAPP_SECRET}
+      - IdentityServer__SigningCredential__Path=${IDS_SIGNING_CERT_PATH:?set IDS_SIGNING_CERT_PATH}
+      - IdentityServer__SigningCredential__Password=${IDS_SIGNING_CERT_PASSWORD}
+
+  auction-svc:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Server=postgres:5432;User Id=postgres;Password=${POSTGRES_PASSWORD};Database=auctions
+
+  search-svc:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__MongoDbConnection=mongodb://${MONGO_USER:-root}:${MONGO_PASSWORD}@mongodb:27017/?authSource=admin
+
+  bidding-svc:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__BidDbConnection=mongodb://${MONGO_USER:-root}:${MONGO_PASSWORD}@mongodb:27017/?authSource=admin
+      # Inject the ledger signing key so every instance signs with the same key.
+      - BidLedger__KeyPem=${BID_LEDGER_KEY_PEM:?set BID_LEDGER_KEY_PEM}
+
+  notification-svc:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+
+  gateway-svc:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production

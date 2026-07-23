@@ -488,6 +488,8 @@ bid-ledger-rsa.pem
 **/.env
 **/.env.*
 !**/.env.example
+!**/*.env.example
+!**/.env.prod.example
 **/*.pem
 **/bid-ledger-rsa.pem
 **/tempkey.jwk
