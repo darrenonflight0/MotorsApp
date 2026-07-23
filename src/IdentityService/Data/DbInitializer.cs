@@ -12,6 +12,12 @@ public class DbInitializer
     {
         using var scope = app.Services.CreateScope();
 
+        // Apply the IdentityServer operational-store schema (persisted grants /
+        // refresh tokens) so it exists before the server starts issuing tokens.
+        scope.ServiceProvider
+            .GetRequiredService<Duende.IdentityServer.EntityFramework.DbContexts.PersistedGrantDbContext>()
+            .Database.Migrate();
+
         SeedData(scope.ServiceProvider.GetService<ApplicationDbContext>(),
             scope.ServiceProvider.GetService<UserManager<ApplicationUser>>(),
             scope.ServiceProvider.GetService<RoleManager<IdentityRole>>());

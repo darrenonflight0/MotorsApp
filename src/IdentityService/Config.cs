@@ -18,23 +18,20 @@ public static class Config
             new ApiScope("auctionApp", "Auction app full access"),
         };
 
-    public static IEnumerable<Client> Clients(IConfiguration config) =>
-        new Client[]
+    public static IEnumerable<Client> Clients(IConfiguration config, bool isDevelopment)
+    {
+        // Client secrets come from configuration (env vars / user-secrets / key vault)
+        // so no real secret is ever committed to source. The literals below are
+        // development-only fallbacks; production MUST override them.
+        var nextSecret = config["IdentityServer:Clients:nextApp:Secret"] ?? "secret";
+
+        var clients = new List<Client>
         {
-            new Client
-            {
-                ClientId = "postman",
-                ClientName = "Postman",
-                AllowedScopes = { "openid", "profile", "auctionApp" },
-                RedirectUris = { "https://www.getpostman.com/oauth2/callback" },
-                ClientSecrets = new[] { new Secret("NotASecret".Sha256()) },
-                AllowedGrantTypes = { GrantType.ResourceOwnerPassword },
-            },
             new Client
             {
                 ClientId = "nextApp",
                 ClientName = "nextApp",
-                ClientSecrets = { new Secret("secret".Sha256()) },
+                ClientSecrets = { new Secret(nextSecret.Sha256()) },
                 AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
                 RequirePkce = false,
                 RedirectUris = { config["ClientApp"] + "/api/auth/callback/id-server" },
@@ -51,4 +48,24 @@ public static class Config
                 AlwaysIncludeUserClaimsInIdToken = true,
             },
         };
+
+        // The Postman client uses the Resource Owner Password grant, which trades
+        // the user's password directly for tokens. It exists only as a local
+        // testing convenience and must never be exposed in production.
+        if (isDevelopment)
+        {
+            var postmanSecret = config["IdentityServer:Clients:postman:Secret"] ?? "NotASecret";
+            clients.Add(new Client
+            {
+                ClientId = "postman",
+                ClientName = "Postman",
+                AllowedScopes = { "openid", "profile", "auctionApp" },
+                RedirectUris = { "https://www.getpostman.com/oauth2/callback" },
+                ClientSecrets = { new Secret(postmanSecret.Sha256()) },
+                AllowedGrantTypes = { GrantType.ResourceOwnerPassword },
+            });
+        }
+
+        return clients;
+    }
 }

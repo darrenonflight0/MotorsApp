@@ -15,20 +15,38 @@ public class BidLedger
 {
     private readonly RSA _rsa;
 
-    public BidLedger(IConfiguration config, ILogger<BidLedger> logger)
+    public BidLedger(IConfiguration config, IHostEnvironment env, ILogger<BidLedger> logger)
     {
         _rsa = RSA.Create(2048);
 
+        // Key material may be injected directly (BidLedger:KeyPem — ideal for
+        // container secrets / key vaults) or loaded from a file path. Auto-
+        // generating a throwaway key is a development-only convenience: in
+        // production every instance would otherwise sign with a different key,
+        // making signatures unverifiable across the fleet and after a restart.
+        var inlinePem = config["BidLedger:KeyPem"];
         var keyPath = config["BidLedger:KeyPath"] ?? "bid-ledger-rsa.pem";
-        if (File.Exists(keyPath))
+
+        if (!string.IsNullOrWhiteSpace(inlinePem))
+        {
+            _rsa.ImportFromPem(inlinePem);
+            logger.LogInformation("SECURITY bid_ledger_key_loaded source=config");
+        }
+        else if (File.Exists(keyPath))
         {
             _rsa.ImportFromPem(File.ReadAllText(keyPath));
             logger.LogInformation("SECURITY bid_ledger_key_loaded path={Path}", keyPath);
         }
-        else
+        else if (env.IsDevelopment())
         {
             File.WriteAllText(keyPath, _rsa.ExportRSAPrivateKeyPem());
             logger.LogWarning("SECURITY bid_ledger_key_generated path={Path}", keyPath);
+        }
+        else
+        {
+            throw new InvalidOperationException(
+                "No bid-ledger signing key configured (set BidLedger:KeyPem or BidLedger:KeyPath). " +
+                "Refusing to start in production with an ephemeral per-instance key.");
         }
     }
 

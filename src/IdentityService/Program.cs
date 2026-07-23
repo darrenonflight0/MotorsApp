@@ -1,3 +1,4 @@
+using System.Security.Cryptography.X509Certificates;
 using Duende.IdentityServer;
 using IdentityService;
 using IdentityService.Data;
@@ -39,7 +40,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 builder.Services.AddScoped<IPasswordHasher<ApplicationUser>, BCryptPasswordHasher>();
 builder.Services.AddScoped<IAppEmailSender, EmailSender>();
 
-builder.Services.AddIdentityServer(options =>
+var idsvcBuilder = builder.Services.AddIdentityServer(options =>
 {
     options.Events.RaiseErrorEvents = true;
     options.Events.RaiseInformationEvents = true;
@@ -52,9 +53,39 @@ builder.Services.AddIdentityServer(options =>
 })
     .AddInMemoryIdentityResources(Config.IdentityResources)
     .AddInMemoryApiScopes(Config.ApiScopes)
-    .AddInMemoryClients(Config.Clients(builder.Configuration))
+    .AddInMemoryClients(Config.Clients(builder.Configuration, builder.Environment.IsDevelopment()))
     .AddAspNetIdentity<ApplicationUser>()
-    .AddProfileService<CustomProfileService>();
+    .AddProfileService<CustomProfileService>()
+    // Persist operational data (refresh tokens / grants) in Postgres so that
+    // restarting the service no longer invalidates every user's session.
+    .AddOperationalStore(options =>
+    {
+        options.ConfigureDbContext = b => b.UseNpgsql(
+            builder.Configuration.GetConnectionString("DefaultConnection"),
+            sql => sql.MigrationsAssembly(typeof(Program).Assembly.FullName));
+        options.EnableTokenCleanup = true;
+        options.TokenCleanupInterval = 3600;
+    });
+
+// Signing key: a persisted developer key locally, a managed X.509 certificate in
+// production. Refuse to start in production without one rather than silently
+// falling back to an ephemeral key that rotates on every restart/instance.
+if (builder.Environment.IsDevelopment())
+{
+    idsvcBuilder.AddDeveloperSigningCredential();
+}
+else
+{
+    var certPath = builder.Configuration["IdentityServer:SigningCredential:Path"];
+    var certPassword = builder.Configuration["IdentityServer:SigningCredential:Password"];
+    if (string.IsNullOrWhiteSpace(certPath) || !File.Exists(certPath))
+    {
+        throw new InvalidOperationException(
+            "Production requires a signing certificate at IdentityServer:SigningCredential:Path. " +
+            "Refusing to start with an ephemeral developer key.");
+    }
+    idsvcBuilder.AddSigningCredential(new X509Certificate2(certPath, certPassword));
+}
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
