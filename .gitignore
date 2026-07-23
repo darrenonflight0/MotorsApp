@@ -500,3 +500,6 @@ bid-ledger-rsa.pem
 # Local Claude Code tooling & MCP config (contains API keys / machine-specific)
 .claude/
 .mcp.json
+
+# Design-hook cache (local tooling artifact)
+**/.impeccable/
