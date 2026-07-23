@@ -42,6 +42,11 @@ services:
       - ConnectionStrings__BidDbConnection=mongodb://${MONGO_USER:-root}:${MONGO_PASSWORD}@mongodb:27017/?authSource=admin
       # Inject the ledger signing key so every instance signs with the same key.
       - BidLedger__KeyPem=${BID_LEDGER_KEY_PEM:?set BID_LEDGER_KEY_PEM}
+      # Escrow payment provider (Stripe | Paystack) + its secret.
+      - Payments__Provider=${PAYMENTS_PROVIDER:?set PAYMENTS_PROVIDER}
+      - Payments__Paystack__SecretKey=${PAYSTACK_SECRET_KEY}
+      - Payments__Paystack__Currency=${PAYSTACK_CURRENCY:-GHS}
+      - Payments__Stripe__SecretKey=${STRIPE_SECRET_KEY}
 
   notification-svc:
     environment:
