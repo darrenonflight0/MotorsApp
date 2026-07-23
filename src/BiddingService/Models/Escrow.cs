@@ -30,6 +30,12 @@ public class Escrow : Entity
     public DateTime? FundedAt { get; set; }
     public DateTime? ClosedAt { get; set; }
 
+    // Payment provider bookkeeping.
+    public string PaymentProvider { get; set; }        // e.g. "Simulated" or "Stripe"
+    public string DepositReference { get; set; }       // captured deposit id (e.g. Stripe PaymentIntent)
+    public string PayoutReference { get; set; }        // release/refund transaction id
+    public string SellerPayoutAccount { get; set; }    // seller's connected-account id for payouts
+
     public List<string> AuditTrail { get; set; } = new();
 
     public void Audit(string actor, string action)

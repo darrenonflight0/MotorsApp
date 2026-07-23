@@ -1,4 +1,5 @@
 using BiddingService.Models;
+using BiddingService.Services.Payments;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Entities;
@@ -11,16 +12,18 @@ namespace BiddingService.Controllers;
 public class EscrowController : ControllerBase
 {
     private readonly ILogger<EscrowController> _logger;
+    private readonly IEscrowPaymentProvider _payments;
 
-    public EscrowController(ILogger<EscrowController> logger)
+    public EscrowController(ILogger<EscrowController> logger, IEscrowPaymentProvider payments)
     {
         _logger = logger;
+        _payments = payments;
     }
 
     private string Username => User.Identity!.Name;
     private bool IsAdmin => User.IsInRole("Admin");
 
-    private static object ToDto(Escrow e) => new
+    private object ToDto(Escrow e) => new
     {
         id = e.ID,
         auctionId = e.AuctionId,
@@ -31,6 +34,9 @@ public class EscrowController : ControllerBase
         createdAt = e.CreatedAt,
         fundedAt = e.FundedAt,
         closedAt = e.ClosedAt,
+        paymentProvider = e.PaymentProvider,
+        // Lets the UI clearly disclose when funds are simulated rather than real.
+        fundsAreReal = _payments.HandlesRealFunds,
     };
 
     [HttpGet("{auctionId}")]
@@ -64,9 +70,14 @@ public class EscrowController : ControllerBase
         return Ok(escrows.Select(ToDto));
     }
 
-    /// <summary>Buyer pays the winning amount into escrow (simulated in development).</summary>
+    /// <summary>
+    /// Buyer pays the winning amount into escrow. The money movement runs through
+    /// the configured payment provider (real Stripe capture in production, a
+    /// simulation in development). <paramref name="paymentReference"/> carries the
+    /// provider token (e.g. a Stripe PaymentIntent id) when required.
+    /// </summary>
     [HttpPost("{auctionId}/deposit")]
-    public async Task<ActionResult> Deposit(string auctionId)
+    public async Task<ActionResult> Deposit(string auctionId, [FromQuery] string paymentReference = null)
     {
         var escrow = await FindEscrow(auctionId);
         if (escrow == null) return NotFound();
@@ -83,13 +94,22 @@ public class EscrowController : ControllerBase
             return BadRequest($"Cannot deposit while escrow is {escrow.Status}");
         }
 
+        var payment = await _payments.CaptureDepositAsync(escrow, paymentReference);
+        if (!payment.Success)
+        {
+            _logger.LogWarning("PAYMENT deposit_failed auction={Auction} reason={Reason}", auctionId, payment.Message);
+            return StatusCode(StatusCodes.Status402PaymentRequired, new { error = payment.Message });
+        }
+
         escrow.Status = EscrowStatus.Funded;
         escrow.FundedAt = DateTime.UtcNow;
-        escrow.Audit(Username, "buyer deposited funds");
+        escrow.PaymentProvider = _payments.Name;
+        escrow.DepositReference = payment.ProviderReference;
+        escrow.Audit(Username, $"buyer deposited funds via {_payments.Name} (ref {payment.ProviderReference})");
         await DB.SaveAsync(escrow);
 
-        _logger.LogInformation("SECURITY escrow_funded auction={Auction} buyer={Buyer} amount={Amount}",
-            auctionId, Username, escrow.Amount);
+        _logger.LogInformation("SECURITY escrow_funded auction={Auction} buyer={Buyer} amount={Amount} provider={Provider}",
+            auctionId, Username, escrow.Amount, _payments.Name);
         return Ok(ToDto(escrow));
     }
 
@@ -112,9 +132,17 @@ public class EscrowController : ControllerBase
             return BadRequest($"Cannot release while escrow is {escrow.Status}");
         }
 
+        var payout = await _payments.ReleaseToSellerAsync(escrow);
+        if (!payout.Success)
+        {
+            _logger.LogWarning("PAYMENT release_failed auction={Auction} reason={Reason}", auctionId, payout.Message);
+            return StatusCode(StatusCodes.Status402PaymentRequired, new { error = payout.Message });
+        }
+
         escrow.Status = EscrowStatus.Released;
         escrow.ClosedAt = DateTime.UtcNow;
-        escrow.Audit(Username, "buyer confirmed delivery; funds released to seller");
+        escrow.PayoutReference = payout.ProviderReference;
+        escrow.Audit(Username, $"buyer confirmed delivery; funds released to seller (ref {payout.ProviderReference})");
         await DB.SaveAsync(escrow);
 
         _logger.LogInformation("SECURITY escrow_released auction={Auction} seller={Seller} amount={Amount}",
@@ -165,9 +193,20 @@ public class EscrowController : ControllerBase
             return BadRequest($"Cannot resolve while escrow is {escrow.Status}");
         }
 
+        var settlement = outcome == "release"
+            ? await _payments.ReleaseToSellerAsync(escrow)
+            : await _payments.RefundBuyerAsync(escrow);
+        if (!settlement.Success)
+        {
+            _logger.LogWarning("PAYMENT resolve_failed auction={Auction} outcome={Outcome} reason={Reason}",
+                auctionId, outcome, settlement.Message);
+            return StatusCode(StatusCodes.Status402PaymentRequired, new { error = settlement.Message });
+        }
+
         escrow.Status = outcome == "release" ? EscrowStatus.Released : EscrowStatus.Refunded;
         escrow.ClosedAt = DateTime.UtcNow;
-        escrow.Audit(Username, $"admin resolved dispute: {outcome}");
+        escrow.PayoutReference = settlement.ProviderReference;
+        escrow.Audit(Username, $"admin resolved dispute: {outcome} (ref {settlement.ProviderReference})");
         await DB.SaveAsync(escrow);
 
         _logger.LogWarning("SECURITY escrow_resolved auction={Auction} outcome={Outcome} admin={Admin}",
