@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] · Yamkela Motors</title>
+    <style>
+        :root {
+            --ink: #0e1116;
+            --ink-soft: #1b2027;
+            --paper: #f7f5f1;
+            --paper-raised: #fffefb;
+            --redline: #e4002b;
+            --redline-deep: #b80022;
+            --chrome: #d7dae0;
+            --chrome-dark: #363c45;
+            --asphalt: #5a6069;
+            --racing: #1e7d5a;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+            background: radial-gradient(120% 90% at 50% -10%, #fffdf8 0%, var(--paper) 55%) fixed;
+            color: var(--ink);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar {
+            border-bottom: 1px solid var(--chrome);
+            background: var(--paper-raised);
+        }
+
+        .topbar-redline {
+            height: 3px;
+            background: linear-gradient(to right, var(--redline), var(--redline-deep), var(--redline));
+        }
+
+        .topbar-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: .8rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        .wordmark {
+            font-weight: 800;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            font-size: 1.05rem;
+            color: var(--ink);
+            text-decoration: none;
+        }
+
+        .wordmark span { color: var(--asphalt); font-weight: 600; }
+
+        .tagline {
+            font-family: ui-monospace, "Cascadia Mono", monospace;
+            font-size: .62rem;
+            text-transform: uppercase;
+            letter-spacing: .22em;
+            color: var(--asphalt);
+        }
+
+        main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 5vh 1.25rem 3rem; }
+
+        .split {
+            width: 100%;
+            max-width: 880px;
+            display: grid;
+            grid-template-columns: 1fr;
+            border: 1px solid var(--chrome);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 1px 2px rgba(14,17,22,.04), 0 18px 40px -22px rgba(14,17,22,.4);
+            background: var(--paper-raised);
+        }
+
+        .brand-panel { display: none; }
+
+        @@media (min-width: 780px) {
+            .split { grid-template-columns: 1fr 1fr; }
+            .brand-panel {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                padding: 2.5rem 2rem;
+                color: var(--paper);
+                background:
+                    radial-gradient(120% 80% at 20% 0%, #232a33 0%, var(--ink) 60%);
+                position: relative;
+                overflow: hidden;
+            }
+        }
+
+        .brand-panel h2 {
+            font-size: 1.9rem;
+            line-height: 1.1;
+            letter-spacing: -.02em;
+            margin: 0;
+        }
+        .brand-panel h2 .accent { color: var(--redline); }
+        .brand-panel .kicker {
+            font-family: ui-monospace, "Cascadia Mono", monospace;
+            font-size: .62rem;
+            text-transform: uppercase;
+            letter-spacing: .24em;
+            color: var(--chrome);
+            margin-bottom: .9rem;
+        }
+        .brand-panel ul { list-style: none; padding: 0; margin: 1.75rem 0 0; }
+        .brand-panel li {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            font-size: .9rem;
+            color: #d7dae0;
+            margin-bottom: .8rem;
+        }
+        .brand-panel li svg { width: 18px; height: 18px; color: var(--racing); flex-shrink: 0; }
+        .brand-panel .redline-strip {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: linear-gradient(to right, var(--redline), var(--redline-deep), var(--redline));
+        }
+
+        .container {
+            width: 100%;
+            padding: 2.25rem 2rem;
+        }
+
+        h1 { font-size: 1.45rem; margin: 0 0 .35rem; letter-spacing: -.01em; }
+
+        .sub { color: var(--asphalt); font-size: .9rem; margin: 0 0 1.25rem; }
+
+        label {
+            display: block;
+            margin: .9rem 0 .3rem;
+            font-family: ui-monospace, "Cascadia Mono", monospace;
+            font-size: .66rem;
+            text-transform: uppercase;
+            letter-spacing: .2em;
+            color: var(--asphalt);
+        }
+
+        input {
+            width: 100%;
+            padding: .65rem .7rem;
+            border: 1px solid rgba(54,60,69,.25);
+            border-radius: 8px;
+            font-size: .95rem;
+            background: #fff;
+            transition: border-color .15s;
+        }
+
+        input:focus { outline: none; border-color: var(--redline); }
+
+        .pw-wrap { position: relative; }
+        .pw-wrap input { padding-right: 3rem; }
+        .pw-toggle {
+            position: absolute;
+            top: 0;
+            right: 0;
+            height: 100%;
+            width: 2.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: none;
+            border: none;
+            color: var(--asphalt);
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+        }
+        .pw-toggle:hover { color: var(--redline); }
+        .pw-toggle svg { width: 20px; height: 20px; }
+
+        button[type=submit], .btn-primary {
+            margin-top: 1.35rem;
+            width: 100%;
+            padding: .7rem;
+            background: var(--redline);
+            color: var(--paper);
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: .85rem;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        button[type=submit]:hover, .btn-primary:hover { background: var(--redline-deep); }
+
+        .btn-external {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .6rem;
+            width: 100%;
+            padding: .65rem;
+            margin-top: .9rem;
+            background: #fff;
+            border: 1px solid rgba(54,60,69,.25);
+            border-radius: 8px;
+            color: var(--ink);
+            font-weight: 600;
+            font-size: .9rem;
+            text-decoration: none;
+            transition: border-color .15s;
+        }
+
+        .btn-external:hover { border-color: var(--chrome-dark); }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            margin: 1.35rem 0 .4rem;
+            color: var(--asphalt);
+            font-size: .72rem;
+            text-transform: uppercase;
+            letter-spacing: .18em;
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--chrome);
+        }
+
+        .error { color: var(--redline); font-size: .85rem; margin-top: .6rem; }
+        .error ul { margin: .25rem 0 0; padding-left: 1.1rem; }
+
+        .notice {
+            background: rgba(30,125,90,.08);
+            color: var(--racing);
+            border-radius: 8px;
+            padding: .7rem .8rem;
+            font-size: .87rem;
+            margin-bottom: 1rem;
+        }
+
+        .links { margin-top: 1.25rem; display: flex; justify-content: space-between; font-size: .85rem; }
+        .links a { color: var(--ink); font-weight: 600; text-decoration: none; }
+        .links a:hover { color: var(--redline); }
+
+        .security-note {
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--chrome);
+            font-size: .75rem;
+            color: var(--asphalt);
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="topbar-redline"></div>
+        <div class="topbar-inner">
+            <a class="wordmark" href="/">Yamkela <span>Motors</span></a>
+            <span class="tagline">Secure sign in</span>
+        </div>
+    </header>
+    <main>
+        <div class="split">
+            <aside class="brand-panel">
+                <span class="redline-strip"></span>
+                <div>
+                    <div class="kicker">Live car auctions</div>
+                    <h2>Your bid.<br />Your drive.<br /><span class="accent">Your way.</span></h2>
+                </div>
+                <ul>
+                    <li>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                        Bank-grade sign in with lockout protection
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                        Tamper-evident, signed bidding ledger
+                    </li>
+                    <li>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                        Escrow-protected payments
+                    </li>
+                </ul>
+            </aside>
+            <div class="container">
+                @RenderBody()
+                <p class="security-note">
+                    Yamkela Motors will never ask for your password, card number or banking details
+                    by email or phone. Only enter your credentials on this page's address.
+                </p>
+            </div>
+        </div>
+    </main>
+    <script>
+        (function () {
+            var eye = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+            var eyeOff = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-6.5 0-10-7-10-7a18.4 18.4 0 0 1 5.06-5.94M9.9 4.24A9.1 9.1 0 0 1 12 4c6.5 0 10 7 10 7a18.5 18.5 0 0 1-2.16 3.19M1 1l22 22"/></svg>';
+            document.querySelectorAll('input[type=password]').forEach(function (input) {
+                var wrap = document.createElement('div');
+                wrap.className = 'pw-wrap';
+                input.parentNode.insertBefore(wrap, input);
+                wrap.appendChild(input);
+                var btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'pw-toggle';
+                btn.setAttribute('aria-label', 'Show password');
+                btn.innerHTML = eye;
+                wrap.appendChild(btn);
+                btn.addEventListener('click', function () {
+                    var show = input.type === 'password';
+                    input.type = show ? 'text' : 'password';
+                    btn.innerHTML = show ? eyeOff : eye;
+                    btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+                });
+            });
+        })();
+    </script>
+</body>
+</html>

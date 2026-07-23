@@ -1,0 +1,31 @@
+@page
+@model IdentityService.Pages.Account.Forgot.Index
+
+@{
+    ViewData["Title"] = "Forgot password";
+}
+
+<h1>Forgot your password?</h1>
+<p class="sub">Enter your account email. If it exists, we'll send a secure reset link. The link expires quickly and can be used once.</p>
+
+@if (Model.Sent)
+{
+    <div class="notice">
+        If an account exists for that email, a reset link is on its way. Check your inbox.
+    </div>
+}
+else
+{
+    <form method="post">
+        <label asp-for="Input.Email">Email</label>
+        <input asp-for="Input.Email" type="email" autocomplete="email" autofocus />
+
+        <div asp-validation-summary="All" class="error"></div>
+
+        <button type="submit">Send reset link</button>
+    </form>
+}
+
+<div class="links">
+    <a asp-page="/Account/Login/Index">Back to sign in</a>
+</div>

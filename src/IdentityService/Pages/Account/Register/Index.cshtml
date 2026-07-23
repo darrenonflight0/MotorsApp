@@ -1,0 +1,36 @@
+@page
+@model IdentityService.Pages.Account.Register.Index
+
+@{
+    ViewData["Title"] = "Create account";
+}
+
+<h1>Create your account</h1>
+<p class="sub">One account to bid, sell and settle. Passwords need 10+ characters with upper, lower, number and symbol.</p>
+
+<form method="post">
+    <input type="hidden" asp-for="Input.ReturnUrl" />
+
+    <label asp-for="Input.FullName">Full name</label>
+    <input asp-for="Input.FullName" autocomplete="name" autofocus />
+
+    <label asp-for="Input.Username">Username</label>
+    <input asp-for="Input.Username" autocomplete="username" />
+
+    <label asp-for="Input.Email">Email</label>
+    <input asp-for="Input.Email" type="email" autocomplete="email" />
+
+    <label asp-for="Input.Password">Password</label>
+    <input asp-for="Input.Password" type="password" autocomplete="new-password" />
+
+    <label asp-for="Input.ConfirmPassword">Confirm password</label>
+    <input asp-for="Input.ConfirmPassword" type="password" autocomplete="new-password" />
+
+    <div asp-validation-summary="All" class="error"></div>
+
+    <button type="submit">Create account</button>
+</form>
+
+<div class="links">
+    <a asp-page="/Account/Login/Index" asp-route-returnUrl="@Model.Input.ReturnUrl">Already have an account? Sign in</a>
+</div>
