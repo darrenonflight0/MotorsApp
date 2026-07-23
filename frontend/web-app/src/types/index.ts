@@ -55,4 +55,7 @@ export type Escrow = {
   createdAt: string;
   fundedAt?: string;
   closedAt?: string;
+  paymentProvider?: string;
+  activeProvider?: string;
+  fundsAreReal?: boolean;
 };

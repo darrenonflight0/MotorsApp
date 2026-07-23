@@ -35,6 +35,9 @@ public class EscrowController : ControllerBase
         fundedAt = e.FundedAt,
         closedAt = e.ClosedAt,
         paymentProvider = e.PaymentProvider,
+        // The currently-configured provider, so the UI can pick the right
+        // checkout (e.g. Paystack) even before a deposit has been recorded.
+        activeProvider = _payments.Name,
         // Lets the UI clearly disclose when funds are simulated rather than real.
         fundsAreReal = _payments.HandlesRealFunds,
     };

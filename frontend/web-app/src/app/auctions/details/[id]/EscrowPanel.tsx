@@ -11,6 +11,7 @@ import { numberWithCommas } from '@/lib/format';
 import { Escrow } from '@/types';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import PaystackDepositButton from './PaystackDepositButton';
 
 type Props = {
   auctionId: string;
@@ -108,13 +109,24 @@ export default function EscrowPanel({ auctionId, username }: Props) {
 
         <div className="mt-4 flex flex-wrap gap-3">
           {isBuyer && escrow.status === 'AwaitingDeposit' && (
-            <button
-              disabled={busy}
-              onClick={() => run(depositEscrow, 'Funds deposited into escrow')}
-              className="btn-primary"
-            >
-              {busy ? 'Working…' : 'Deposit into escrow'}
-            </button>
+            escrow.fundsAreReal && escrow.activeProvider === 'Paystack' ? (
+              <PaystackDepositButton
+                auctionId={auctionId}
+                amount={escrow.amount}
+                // TODO: surface the buyer's real email (add the OIDC `email` scope);
+                // a reserved placeholder is fine for Paystack test mode.
+                email={`${username}@example.com`}
+                onFunded={setEscrow}
+              />
+            ) : (
+              <button
+                disabled={busy}
+                onClick={() => run(depositEscrow, 'Funds deposited into escrow')}
+                className="btn-primary"
+              >
+                {busy ? 'Working…' : 'Deposit into escrow'}
+              </button>
+            )
           )}
           {isBuyer && escrow.status === 'Funded' && (
             <button

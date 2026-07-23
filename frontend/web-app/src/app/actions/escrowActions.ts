@@ -13,8 +13,14 @@ export async function getMyEscrows(): Promise<Escrow[] | { error: unknown }> {
   return await fetchWrapper.get('escrow/mine');
 }
 
-export async function depositEscrow(auctionId: string): Promise<EscrowResult> {
-  return await fetchWrapper.post(`escrow/${auctionId}/deposit`, {});
+export async function depositEscrow(
+  auctionId: string,
+  paymentReference?: string
+): Promise<EscrowResult> {
+  const query = paymentReference
+    ? `?paymentReference=${encodeURIComponent(paymentReference)}`
+    : '';
+  return await fetchWrapper.post(`escrow/${auctionId}/deposit${query}`, {});
 }
 
 export async function confirmDelivery(auctionId: string): Promise<EscrowResult> {
