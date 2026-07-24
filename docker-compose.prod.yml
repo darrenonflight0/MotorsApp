@@ -25,6 +25,9 @@ services:
       - IdentityServer__Clients__nextApp__Secret=${IDS_NEXTAPP_SECRET:?set IDS_NEXTAPP_SECRET}
       - IdentityServer__SigningCredential__Path=${IDS_SIGNING_CERT_PATH:?set IDS_SIGNING_CERT_PATH}
       - IdentityServer__SigningCredential__Password=${IDS_SIGNING_CERT_PASSWORD}
+      # Google sign-in activates only when both are set (optional).
+      - Authentication__Google__ClientId=${GOOGLE_CLIENT_ID}
+      - Authentication__Google__ClientSecret=${GOOGLE_CLIENT_SECRET}
 
   auction-svc:
     environment:
