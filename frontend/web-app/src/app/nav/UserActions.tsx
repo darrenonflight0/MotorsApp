@@ -10,7 +10,7 @@ import { AiFillCar, AiFillTrophy, AiOutlineLogout } from 'react-icons/ai';
 import { HiCog, HiUser } from 'react-icons/hi';
 
 type Props = {
-  user: { username?: string | null; name?: string | null };
+  user: { username?: string | null; name?: string | null; role?: string | string[] };
 };
 
 export default function UserActions({ user }: Props) {
@@ -18,6 +18,8 @@ export default function UserActions({ user }: Props) {
   const router = useRouter();
   const reduceMotion = useReducedMotion();
   const setParams = useParamsStore((state) => state.setParams);
+
+  const isAdmin = Array.isArray(user.role) ? user.role.includes('Admin') : user.role === 'Admin';
 
   function setWinner() {
     setParams({ winner: user.username ?? undefined, seller: undefined });
@@ -49,6 +51,18 @@ export default function UserActions({ user }: Props) {
             transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
             className="absolute right-0 z-50 mt-3 w-56 rounded-xl border border-chrome/80 bg-paper-raised py-1 text-sm shadow-lot-hover"
           >
+            {isAdmin && (
+              <>
+                <Link
+                  href="/admin"
+                  onClick={() => setOpen(false)}
+                  className="dropdown-item block font-semibold !text-redline"
+                >
+                  <HiCog className="mr-2 inline" /> Admin dashboard
+                </Link>
+                <div className="my-1 border-t border-chrome/70" />
+              </>
+            )}
             {user.username && (
               <Link
                 href={`/users/${encodeURIComponent(user.username)}`}

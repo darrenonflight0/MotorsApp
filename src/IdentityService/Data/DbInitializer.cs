@@ -47,6 +47,25 @@ public class DbInitializer
             }
         }
 
+        // Ensure a platform admin exists. Runs even when other users are already
+        // seeded, so an existing database still gets an admin account.
+        if (userManager.FindByNameAsync("admin").Result == null)
+        {
+            var admin = new ApplicationUser
+            {
+                UserName = "admin",
+                Email = "admin@yamkela.example",
+                EmailConfirmed = true
+            };
+            userManager.CreateAsync(admin, "Admin123$pass").Result.ToString();
+            userManager.AddClaimsAsync(admin, new Claim[]
+            {
+                new Claim(JwtClaimTypes.Name, "Platform Admin")
+            }).Wait();
+            userManager.AddToRoleAsync(admin, "Admin").Wait();
+            Console.WriteLine("Admin user seeded");
+        }
+
         if (userManager.Users.Any()) return;
 
         var bob = new ApplicationUser

@@ -7,6 +7,7 @@ declare module 'next-auth' {
     error?: string;
     user: {
       username?: string;
+      role?: string | string[];
     } & DefaultSession['user'];
   }
 }
@@ -14,6 +15,7 @@ declare module 'next-auth' {
 declare module 'next-auth/jwt' {
   interface JWT {
     username?: string;
+    role?: string | string[];
     accessToken?: string;
     refreshToken?: string;
     expiresAt?: number;

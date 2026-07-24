@@ -73,6 +73,31 @@ public class EscrowController : ControllerBase
         return Ok(escrows.Select(ToDto));
     }
 
+    /// <summary>Admin: every disputed escrow awaiting resolution.</summary>
+    [Authorize(Roles = "Admin")]
+    [HttpGet("admin/disputed")]
+    public async Task<ActionResult> Disputed()
+    {
+        var escrows = await DB.Find<Escrow>()
+            .Match(e => e.Status == EscrowStatus.Disputed)
+            .Sort(b => b.Ascending(e => e.CreatedAt))
+            .ExecuteAsync();
+
+        return Ok(escrows.Select(ToDto));
+    }
+
+    /// <summary>Admin: all escrows, newest first (for oversight).</summary>
+    [Authorize(Roles = "Admin")]
+    [HttpGet("admin/all")]
+    public async Task<ActionResult> All()
+    {
+        var escrows = await DB.Find<Escrow>()
+            .Sort(b => b.Descending(e => e.CreatedAt))
+            .ExecuteAsync();
+
+        return Ok(escrows.Select(ToDto));
+    }
+
     /// <summary>
     /// Buyer pays the winning amount into escrow. The money movement runs through
     /// the configured payment provider (real Stripe capture in production, a

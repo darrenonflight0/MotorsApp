@@ -30,3 +30,20 @@ export async function confirmDelivery(auctionId: string): Promise<EscrowResult> 
 export async function disputeEscrow(auctionId: string): Promise<EscrowResult> {
   return await fetchWrapper.post(`escrow/${auctionId}/dispute`, {});
 }
+
+// ── Admin-only (backend enforces the Admin role) ──
+
+export async function getDisputedEscrows(): Promise<Escrow[] | { error: unknown }> {
+  return await fetchWrapper.get('escrow/admin/disputed');
+}
+
+export async function getAllEscrows(): Promise<Escrow[] | { error: unknown }> {
+  return await fetchWrapper.get('escrow/admin/all');
+}
+
+export async function resolveEscrow(
+  auctionId: string,
+  outcome: 'release' | 'refund'
+): Promise<EscrowResult> {
+  return await fetchWrapper.post(`escrow/${auctionId}/resolve?outcome=${outcome}`, {});
+}

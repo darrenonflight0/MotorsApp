@@ -61,8 +61,9 @@ export const authOptions: AuthOptions = {
           : Date.now() + 15 * 60 * 1000;
       }
       if (profile) {
-        // `username` is emitted by the CustomProfileService in IdentityService
+        // `username` and `role` are emitted by the CustomProfileService.
         token.username = (profile as { username?: string }).username;
+        token.role = (profile as { role?: string | string[] }).role;
       }
 
       // Refresh ~60s before expiry.
@@ -75,6 +76,7 @@ export const authOptions: AuthOptions = {
     async session({ session, token }) {
       if (token) {
         session.user.username = token.username;
+        session.user.role = token.role;
         session.accessToken = token.accessToken;
         session.error = token.error as string | undefined;
       }
