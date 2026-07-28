@@ -45,6 +45,7 @@ public class Index : PageModel
             UserName = Input.Username,
             Email = Input.Email,
             EmailConfirmed = true,
+            ProfilePicture = Input.ProfilePicture,
         };
 
         var result = await _userManager.CreateAsync(user, Input.Password);
@@ -99,6 +100,11 @@ public class Index : PageModel
         [Compare(nameof(Password), ErrorMessage = "Passwords do not match.")]
         [Display(Name = "Confirm password")]
         public string ConfirmPassword { get; set; }
+
+        // A profile photo (data URI) chosen and compressed client-side.
+        [Required(ErrorMessage = "Please add a profile picture.")]
+        [MaxLength(3_000_000)]
+        public string ProfilePicture { get; set; }
 
         public string ReturnUrl { get; set; }
     }

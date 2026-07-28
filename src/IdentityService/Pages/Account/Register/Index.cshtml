@@ -10,6 +10,15 @@
 
 <form method="post">
     <input type="hidden" asp-for="Input.ReturnUrl" />
+    <input type="hidden" asp-for="Input.ProfilePicture" id="pfp-data" />
+
+    <div class="pfp-wrap">
+        <label for="pfp-file" class="pfp-preview" id="pfp-preview" title="Add a profile picture">
+            <span id="pfp-placeholder">+ Photo</span>
+        </label>
+        <div class="pfp-hint">Add a profile picture</div>
+        <input type="file" id="pfp-file" accept="image/*" hidden />
+    </div>
 
     <label asp-for="Input.FullName">Full name</label>
     <input asp-for="Input.FullName" autocomplete="name" autofocus />
@@ -34,3 +43,48 @@
 <div class="links">
     <a asp-page="/Account/Login/Index" asp-route-returnUrl="@Model.Input.ReturnUrl">Already have an account? Sign in</a>
 </div>
+
+<style>
+    .pfp-wrap { display: flex; flex-direction: column; align-items: center; gap: 6px; margin: 4px 0 18px; }
+    .pfp-preview {
+        width: 96px; height: 96px; border-radius: 50%; cursor: pointer;
+        border: 2px dashed #c8ccd2; background: #f4f5f7 center/cover no-repeat;
+        display: flex; align-items: center; justify-content: center;
+        color: #8a9099; font-size: 13px; font-weight: 600; overflow: hidden;
+        transition: border-color .15s, transform .15s;
+    }
+    .pfp-preview:hover { border-color: #e11d2a; transform: translateY(-1px); }
+    .pfp-hint { font-size: 12px; color: #8a9099; }
+</style>
+
+<script>
+    (function () {
+        var input = document.getElementById('pfp-file');
+        var preview = document.getElementById('pfp-preview');
+        var placeholder = document.getElementById('pfp-placeholder');
+        var data = document.getElementById('pfp-data');
+        if (!input) return;
+
+        input.addEventListener('change', function () {
+            var file = input.files && input.files[0];
+            if (!file || !file.type.indexOf) return;
+            if (file.type.indexOf('image/') !== 0) return;
+            var img = new Image();
+            var url = URL.createObjectURL(file);
+            img.onload = function () {
+                var max = 400;
+                var scale = Math.min(1, max / Math.max(img.width, img.height));
+                var c = document.createElement('canvas');
+                c.width = Math.round(img.width * scale);
+                c.height = Math.round(img.height * scale);
+                c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+                var uri = c.toDataURL('image/jpeg', 0.75);
+                data.value = uri;
+                preview.style.backgroundImage = 'url(' + uri + ')';
+                if (placeholder) placeholder.style.display = 'none';
+                URL.revokeObjectURL(url);
+            };
+            img.src = url;
+        });
+    })();
+</script>
