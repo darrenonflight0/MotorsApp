@@ -12,11 +12,20 @@ builder.Services.AddMassTransit(x =>
     x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("nt", false));
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host(builder.Configuration["RabbitMq:Host"] ?? "localhost", "/", host =>
+        var rabbitUrl = builder.Configuration["RabbitMq:Url"];
+        if (!string.IsNullOrEmpty(rabbitUrl))
         {
-            host.Username(builder.Configuration.GetValue("RabbitMq:Username", "guest"));
-            host.Password(builder.Configuration.GetValue("RabbitMq:Password", "guest"));
-        });
+            // Full amqp(s):// URI — used by managed brokers like CloudAMQP (TLS + vhost).
+            cfg.Host(new Uri(rabbitUrl));
+        }
+        else
+        {
+            cfg.Host(builder.Configuration["RabbitMq:Host"] ?? "localhost", "/", host =>
+            {
+                host.Username(builder.Configuration.GetValue("RabbitMq:Username", "guest"));
+                host.Password(builder.Configuration.GetValue("RabbitMq:Password", "guest"));
+            });
+        }
         cfg.ConfigureEndpoints(context);
     });
 });
@@ -25,7 +34,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("frontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        // Browser origin allowed to open the SignalR connection — the frontend
+        // URL (localhost in dev, the deployed site in production).
+        var clientApp = builder.Configuration["ClientApp"] ?? "http://localhost:3000";
+        policy.WithOrigins(clientApp)
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();

@@ -13,7 +13,7 @@ COPY src/IdentityService/IdentityService.csproj src/IdentityService/IdentityServ
 COPY src/Contracts/Contracts.csproj src/Contracts/Contracts.csproj
 
 # restore package dependencies
-RUN dotnet restore Yamkela.sln
+RUN dotnet restore src/IdentityService/IdentityService.csproj
 
 # copy the app folders and build
 COPY src/IdentityService src/IdentityService

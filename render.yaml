@@ -1,0 +1,171 @@
+# Render Blueprint for the Yamkela Motors backend.
+# Deploy with:  Render Dashboard → New → Blueprint → connect this repo.
+#
+# Topology
+#   PUBLIC  (web):   gateway (the API entry point) + identity (browser hits it for OIDC login)
+#   PRIVATE (pserv): auction, search, bidding, notification  (reached only via the gateway)
+#   Managed:         PostgreSQL (Render)
+#   External free:   MongoDB Atlas (Mongo)  +  CloudAMQP (RabbitMQ)   ← see DEPLOYMENT.md
+#
+# Values marked `sync: false` are set in the Render dashboard (secrets, composed
+# connection strings, and cross-service HTTPS URLs). DEPLOYMENT.md lists every one.
+
+databases:
+  - name: yamkela-postgres
+    databaseName: yamkela
+    plan: free
+    region: frankfurt
+
+services:
+  # ─────────────────────────── IdentityService (PUBLIC) ───────────────────────────
+  - type: web
+    name: yamkela-identity
+    runtime: docker
+    dockerfilePath: ./src/IdentityService/Dockerfile
+    dockerContext: .
+    region: frankfurt
+    plan: starter
+    healthCheckPath: /.well-known/openid-configuration
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://0.0.0.0:10000
+      # Npgsql-format string built from the Render Postgres connection info.
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      # Public HTTPS URL of THIS service, e.g. https://yamkela-identity.onrender.com
+      - key: IssuerUri
+        sync: false
+      # Public URL of the Vercel frontend (used to build the OIDC redirect URI).
+      - key: ClientApp
+        sync: false
+      - key: IdentityServer__Clients__nextApp__Secret
+        sync: false
+      # Signing cert: upload a .pfx as a Render Secret File, then point here.
+      - key: IdentityServer__SigningCredential__Path
+        value: /etc/secrets/identity-signing.pfx
+      - key: IdentityServer__SigningCredential__Password
+        sync: false
+      - key: Authentication__Google__ClientId
+        sync: false
+      - key: Authentication__Google__ClientSecret
+        sync: false
+
+  # ─────────────────────────── GatewayService (PUBLIC) ────────────────────────────
+  - type: web
+    name: yamkela-gateway
+    runtime: docker
+    dockerfilePath: ./src/GatewayService/Dockerfile
+    dockerContext: .
+    region: frankfurt
+    plan: starter
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://0.0.0.0:10000
+      # Public HTTPS URL of the identity service (token validation authority).
+      - key: IdentityServiceUrl
+        sync: false
+      # Reverse-proxy cluster destinations → internal URLs of the private services.
+      # Render private services are reachable at http://<service-name>:10000
+      - key: ReverseProxy__Clusters__auctions__Destinations__auctionApi__Address
+        value: http://yamkela-auction:10000
+      - key: ReverseProxy__Clusters__search__Destinations__searchApi__Address
+        value: http://yamkela-search:10000
+      - key: ReverseProxy__Clusters__bids__Destinations__bidApi__Address
+        value: http://yamkela-bidding:10000
+      - key: ReverseProxy__Clusters__notifications__Destinations__notifyApi__Address
+        value: http://yamkela-notification:10000
+
+  # ─────────────────────────── AuctionService (PRIVATE) ───────────────────────────
+  - type: pserv
+    name: yamkela-auction
+    runtime: docker
+    dockerfilePath: ./src/AuctionService/Dockerfile
+    dockerContext: .
+    region: frankfurt
+    plan: starter
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://0.0.0.0:10000
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: IdentityServiceUrl
+        sync: false
+      - key: RabbitMq__Url
+        sync: false
+
+  # ─────────────────────────── SearchService (PRIVATE) ────────────────────────────
+  - type: pserv
+    name: yamkela-search
+    runtime: docker
+    dockerfilePath: ./src/SearchService/Dockerfile
+    dockerContext: .
+    region: frankfurt
+    plan: starter
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://0.0.0.0:10000
+      - key: ConnectionStrings__MongoDbConnection
+        sync: false
+      - key: AuctionServiceUrl
+        value: http://yamkela-auction:10000
+      - key: RabbitMq__Url
+        sync: false
+
+  # ─────────────────────────── BiddingService (PRIVATE) ───────────────────────────
+  - type: pserv
+    name: yamkela-bidding
+    runtime: docker
+    dockerfilePath: ./src/BiddingService/Dockerfile
+    dockerContext: .
+    region: frankfurt
+    plan: starter
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://0.0.0.0:10000
+      - key: ConnectionStrings__BidDbConnection
+        sync: false
+      - key: IdentityServiceUrl
+        sync: false
+      - key: AuctionServiceUrl
+        value: http://yamkela-auction:10000
+      - key: RabbitMq__Url
+        sync: false
+      # Escrow payment provider.
+      - key: Payments__Provider
+        value: Paystack
+      - key: Payments__Paystack__SecretKey
+        sync: false
+      - key: Payments__Paystack__Currency
+        value: GHS
+      # Shared RSA ledger key (PEM) — the SAME value on every instance.
+      - key: BidLedger__KeyPem
+        sync: false
+
+  # ─────────────────────────── NotificationService (PRIVATE) ──────────────────────
+  - type: pserv
+    name: yamkela-notification
+    runtime: docker
+    dockerfilePath: ./src/NotificationService/Dockerfile
+    dockerContext: .
+    region: frankfurt
+    plan: starter
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://0.0.0.0:10000
+      - key: RabbitMq__Url
+        sync: false
+      # Browser origin (Vercel URL) allowed to open the SignalR connection.
+      - key: ClientApp
+        sync: false
