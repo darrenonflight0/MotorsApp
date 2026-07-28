@@ -1,5 +1,6 @@
 using System.Security.Cryptography.X509Certificates;
 using Duende.IdentityServer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using IdentityService;
 using IdentityService.Data;
 using IdentityService.Models;
@@ -94,6 +95,17 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 var authBuilder = builder.Services.AddAuthentication();
+
+// Validate our own JWTs for the verification/profile APIs (called by the
+// frontend through the gateway with a Bearer token). The UI keeps using cookies.
+authBuilder.AddJwtBearer(options =>
+{
+    options.Authority = builder.Configuration["IssuerUri"] ?? "http://localhost:5000";
+    options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+    options.TokenValidationParameters.ValidateAudience = false;
+    options.TokenValidationParameters.NameClaimType = "username";
+    options.TokenValidationParameters.RoleClaimType = "role";
+});
 
 // Google OAuth activates only when credentials are configured
 // (Authentication:Google:ClientId / ClientSecret via config or user-secrets).

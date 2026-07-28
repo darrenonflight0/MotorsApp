@@ -27,6 +27,7 @@ public class CustomProfileService : IProfileService
         var claims = new List<Claim>
         {
             new Claim("username", user.UserName),
+            new Claim("verified", user.IsVerified ? "true" : "false"),
         };
         claims.AddRange(roles.Select(role => new Claim("role", role)));
 

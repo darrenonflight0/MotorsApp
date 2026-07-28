@@ -78,6 +78,8 @@ services:
         value: http://yamkela-bidding:10000
       - key: ReverseProxy__Clusters__notifications__Destinations__notifyApi__Address
         value: http://yamkela-notification:10000
+      - key: ReverseProxy__Clusters__identity__Destinations__identityApi__Address
+        value: http://yamkela-identity:10000
 
   # ─────────────────────────── AuctionService (PRIVATE) ───────────────────────────
   - type: pserv
