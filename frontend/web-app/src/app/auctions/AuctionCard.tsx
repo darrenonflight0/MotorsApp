@@ -4,15 +4,19 @@ import Link from 'next/link';
 import CarImage from '../components/CarImage';
 import CountdownTimer from '../components/CountdownTimer';
 import WatchButton from '../components/WatchButton';
+import VerifiedBadge from '../components/VerifiedBadge';
+import { HiOutlinePhotograph } from 'react-icons/hi';
 
 type Props = {
   auction: Auction;
+  sellerVerified?: boolean;
 };
 
-export default function AuctionCard({ auction }: Props) {
+export default function AuctionCard({ auction, sellerVerified }: Props) {
   const lot = auction.id.slice(0, 4).toUpperCase();
   const hasBid = auction.currentHighBid > 0;
   const reserveMet = hasBid && auction.reservePrice > 0 && auction.currentHighBid >= auction.reservePrice;
+  const photoCount = auction.images?.length ?? 0;
 
   const quickSpecs = [
     { label: 'Year', value: auction.year },
@@ -30,6 +34,12 @@ export default function AuctionCard({ auction }: Props) {
           Lot {lot}
         </span>
         <WatchButton auction={auction} />
+
+        {photoCount > 1 && (
+          <span className="absolute bottom-3 right-3 z-10 inline-flex items-center gap-1 rounded bg-ink/70 px-1.5 py-0.5 text-[11px] font-semibold text-paper backdrop-blur-sm transition-opacity duration-300 group-hover:opacity-0">
+            <HiOutlinePhotograph className="h-3 w-3" /> {photoCount}
+          </span>
+        )}
 
         {/* Ken Burns: slow zoom + pan reveals more of the car on hover */}
         <div className="h-full w-full transition-transform duration-[1200ms] ease-out group-hover:scale-[1.12] group-hover:-translate-y-1">
@@ -65,11 +75,16 @@ export default function AuctionCard({ auction }: Props) {
 
       <div className="p-4">
         <div className="flex items-start justify-between gap-3">
-          <h3 className="font-display text-lg font-bold leading-tight text-ink transition-colors group-hover:text-redline">
+          <h3 className="flex items-center gap-1 font-display text-lg font-bold leading-tight text-ink transition-colors group-hover:text-redline">
             {auction.make} {auction.model}
+            <VerifiedBadge verified={sellerVerified} size="sm" />
           </h3>
           <span className="readout mt-0.5 shrink-0 text-sm text-asphalt">{auction.year}</span>
         </div>
+        <span className="mt-1 flex items-center gap-1.5 text-xs text-asphalt">
+          <span className="truncate">@{auction.seller}</span>
+          <VerifiedBadge verified={sellerVerified} variant="badge" />
+        </span>
 
         <div className="mt-3 flex items-end justify-between border-t border-chrome/70 pt-3">
           <div>

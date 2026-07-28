@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getData } from '../actions/auctionActions';
+import { getPublicProfile } from '../actions/verificationActions';
 import { useAuctionStore } from '@/hooks/useAuctionStore';
 import { useParamsStore } from '@/hooks/useParamsStore';
 import { useShallow } from 'zustand/react/shallow';
@@ -14,6 +15,7 @@ import EmptyFilter from '../components/EmptyFilter';
 
 export default function Listings() {
   const [loading, setLoading] = useState(true);
+  const [verifiedSellers, setVerifiedSellers] = useState<Set<string>>(new Set());
   const reduceMotion = useReducedMotion();
 
   const params = useParamsStore(
@@ -53,6 +55,23 @@ export default function Listings() {
       .finally(() => setLoading(false));
   }, [params, setData]);
 
+  // Resolve each unique seller's verified status once per page so every card can
+  // show the blue tick without an N+1 fetch.
+  useEffect(() => {
+    const sellers = Array.from(new Set(auctions.map((a) => a.seller).filter(Boolean)));
+    if (sellers.length === 0) return;
+    let cancelled = false;
+    Promise.all(sellers.map((s) => getPublicProfile(s))).then((results) => {
+      if (cancelled) return;
+      const verified = new Set<string>();
+      results.forEach((r) => {
+        if (r && !('error' in r) && r.verified) verified.add(r.username);
+      });
+      setVerifiedSellers(verified);
+    });
+    return () => { cancelled = true; };
+  }, [auctions]);
+
   if (loading && auctions.length === 0) {
     return (
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -89,7 +108,7 @@ export default function Listings() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.45, delay: i * 0.05, ease: [0.16, 1, 0.3, 1] }}
               >
-                <AuctionCard auction={auction} />
+                <AuctionCard auction={auction} sellerVerified={verifiedSellers.has(auction.seller)} />
               </motion.div>
             ))}
           </div>
