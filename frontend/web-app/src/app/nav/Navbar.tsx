@@ -6,6 +6,7 @@ import UserActions from './UserActions';
 import NotificationBell from './NotificationBell';
 import WatchlistBell from './WatchlistBell';
 import NavLinks from './NavLinks';
+import MobileNav from './MobileNav';
 
 export default async function Navbar() {
   const user = await getCurrentUser();
@@ -23,6 +24,7 @@ export default async function Navbar() {
           <WatchlistBell />
           <NotificationBell />
           {user ? <UserActions user={user} /> : <LoginButton />}
+          <MobileNav />
         </div>
       </div>
       <div className="mx-auto hidden max-w-[1400px] items-center border-t border-chrome/50 px-5 sm:px-8 lg:flex">
