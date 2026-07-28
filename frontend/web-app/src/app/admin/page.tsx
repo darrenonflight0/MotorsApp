@@ -1,9 +1,11 @@
 import { getCurrentUser } from '@/app/actions/authActions';
 import { getAllEscrows, getDisputedEscrows } from '@/app/actions/escrowActions';
+import { getPendingApplications, ReviewApplication } from '@/app/actions/verificationActions';
 import PageHero from '@/app/components/PageHero';
 import { Escrow } from '@/types';
 import Link from 'next/link';
 import AdminDashboard from './AdminDashboard';
+import SellerApplications from './SellerApplications';
 
 export const metadata = {
   title: 'Admin · Yamkela Motors',
@@ -42,15 +44,23 @@ export default async function AdminPage() {
     );
   }
 
-  const [disputed, all] = await Promise.all([getDisputedEscrows(), getAllEscrows()]);
+  const [disputed, all, applications] = await Promise.all([
+    getDisputedEscrows(),
+    getAllEscrows(),
+    getPendingApplications(),
+  ]);
+  const apps: ReviewApplication[] = Array.isArray(applications) ? applications : [];
 
   return (
-    <div>
-      <PageHero
-        eyebrow="Admin"
-        title="Platform administration"
-        subtitle="Oversee escrow settlements and resolve disputes between buyers and sellers."
-      />
+    <div className="space-y-12">
+      <div>
+        <PageHero
+          eyebrow="Admin"
+          title="Platform administration"
+          subtitle="Approve auctioneers and oversee escrow settlements and disputes."
+        />
+      </div>
+      <SellerApplications initial={apps} />
       <AdminDashboard initialDisputed={asArray(disputed)} initialAll={asArray(all)} />
     </div>
   );

@@ -61,9 +61,10 @@ export const authOptions: AuthOptions = {
           : Date.now() + 15 * 60 * 1000;
       }
       if (profile) {
-        // `username` and `role` are emitted by the CustomProfileService.
+        // `username`, `role` and `verified` are emitted by the CustomProfileService.
         token.username = (profile as { username?: string }).username;
         token.role = (profile as { role?: string | string[] }).role;
+        token.verified = (profile as { verified?: string }).verified === 'true';
       }
 
       // Refresh ~60s before expiry.
@@ -77,6 +78,7 @@ export const authOptions: AuthOptions = {
       if (token) {
         session.user.username = token.username;
         session.user.role = token.role;
+        session.user.verified = token.verified;
         session.accessToken = token.accessToken;
         session.error = token.error as string | undefined;
       }

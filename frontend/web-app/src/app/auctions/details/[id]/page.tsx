@@ -1,8 +1,10 @@
 import { getCurrentUser } from '@/app/actions/authActions';
 import { getDetailedViewData } from '@/app/actions/auctionActions';
+import { getPublicProfile } from '@/app/actions/verificationActions';
 import Heading from '@/app/components/Heading';
 import CountdownTimer from '@/app/components/CountdownTimer';
 import CarImage from '@/app/components/CarImage';
+import VerifiedBadge from '@/app/components/VerifiedBadge';
 import Link from 'next/link';
 import DetailedSpecs from './DetailedSpecs';
 import BidList from './BidList';
@@ -15,6 +17,8 @@ export default async function Details({ params }: { params: { id: string } }) {
   const user = await getCurrentUser();
 
   const isSeller = user && user.username === auction.seller;
+  const sellerProfile = await getPublicProfile(auction.seller);
+  const sellerVerified = sellerProfile && !('error' in sellerProfile) ? sellerProfile.verified : false;
 
   return (
     <div>
@@ -34,6 +38,19 @@ export default async function Details({ params }: { params: { id: string } }) {
           )}
           <WatchButton auction={auction} variant="inline" />
         </div>
+      </div>
+
+      {/* Auctioneer verification status — shown on every listing */}
+      <div className="mb-6 flex flex-wrap items-center gap-2 text-sm text-asphalt">
+        <span>Sold by</span>
+        <Link
+          href={`/users/${encodeURIComponent(auction.seller)}`}
+          className="inline-flex items-center gap-1 font-display font-semibold text-ink hover:text-redline"
+        >
+          @{auction.seller}
+          <VerifiedBadge verified={sellerVerified} size="sm" />
+        </Link>
+        <VerifiedBadge verified={sellerVerified} variant="badge" />
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">

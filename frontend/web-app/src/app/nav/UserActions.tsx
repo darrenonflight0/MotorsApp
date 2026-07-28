@@ -7,10 +7,11 @@ import { useRouter } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import { useState } from 'react';
 import { AiFillCar, AiFillTrophy, AiOutlineLogout } from 'react-icons/ai';
-import { HiCog, HiUser } from 'react-icons/hi';
+import { HiBadgeCheck, HiCog, HiUser } from 'react-icons/hi';
+import VerifiedBadge from '@/app/components/VerifiedBadge';
 
 type Props = {
-  user: { username?: string | null; name?: string | null; role?: string | string[] };
+  user: { username?: string | null; name?: string | null; role?: string | string[]; verified?: boolean };
 };
 
 export default function UserActions({ user }: Props) {
@@ -40,6 +41,7 @@ export default function UserActions({ user }: Props) {
         className="flex items-center gap-2 rounded-lg px-2 py-1.5 font-display font-semibold text-ink transition-colors hover:text-redline"
       >
         <HiUser /> {user.name}
+        <VerifiedBadge verified={user.verified} size="sm" />
       </button>
 
       <AnimatePresence>
@@ -78,9 +80,15 @@ export default function UserActions({ user }: Props) {
             <button onClick={setWinner} className="dropdown-item">
               <AiFillTrophy className="mr-2 inline" /> Auctions won
             </button>
-            <Link href="/auctions/create" onClick={() => setOpen(false)} className="dropdown-item block">
-              <HiCog className="mr-2 inline" /> Create auction
-            </Link>
+            {user.verified ? (
+              <Link href="/auctions/create" onClick={() => setOpen(false)} className="dropdown-item block">
+                <AiFillCar className="mr-2 inline" /> List a car
+              </Link>
+            ) : (
+              <Link href="/verify" onClick={() => setOpen(false)} className="dropdown-item block font-semibold text-sky-600">
+                <HiBadgeCheck className="mr-2 inline" /> Get verified to sell
+              </Link>
+            )}
             <Link href="/session" onClick={() => setOpen(false)} className="dropdown-item block">
               <HiUser className="mr-2 inline" /> Session (dev)
             </Link>
