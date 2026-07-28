@@ -1,9 +1,11 @@
 'use client';
 
 import { createAuction, updateAuction } from '@/app/actions/auctionActions';
+import ImageUploader from '@/app/components/ImageUploader';
 import { Auction } from '@/types';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 
@@ -17,7 +19,6 @@ type AuctionFormValues = {
   year: number | string;
   color: string;
   milage: number | string;
-  imageUrl?: string;
   reservePrice?: number | string;
   auctionEnd?: string;
   country?: string;
@@ -29,6 +30,8 @@ const countries = ['Ghana', 'China', 'Japan', 'USA', 'Canada', 'South Africa'];
 export default function AuctionForm({ auction }: Props) {
   const router = useRouter();
   const isEdit = !!auction;
+  const [images, setImages] = useState<string[]>([]);
+  const [imgError, setImgError] = useState(false);
 
   const {
     register,
@@ -61,6 +64,10 @@ export default function AuctionForm({ auction }: Props) {
           auction.id
         );
       } else {
+        if (images.length === 0) {
+          setImgError(true);
+          return;
+        }
         res = await createAuction({
           ...data,
           year: +data.year,
@@ -68,6 +75,8 @@ export default function AuctionForm({ auction }: Props) {
           reservePrice: +(data.reservePrice ?? 0),
           country: data.country || 'Japan',
           auctionEnd: new Date(data.auctionEnd as string).toISOString(),
+          images,
+          imageUrl: images[0],
         });
       }
 
@@ -120,8 +129,16 @@ export default function AuctionForm({ auction }: Props) {
       {!isEdit && (
         <>
           <div>
-            <label className="field-label">Image URL</label>
-            <input {...register('imageUrl', { required: true })} className="field-input" />
+            <label className="field-label">Photos of the car</label>
+            <ImageUploader
+              value={images}
+              onChange={(imgs) => { setImages(imgs); if (imgs.length) setImgError(false); }}
+            />
+            {imgError && (
+              <span className="mt-1 block text-xs font-medium text-redline">
+                Add at least one photo of the car.
+              </span>
+            )}
           </div>
           <div>
             <label className="field-label">Source country</label>

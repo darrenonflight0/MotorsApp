@@ -26,6 +26,9 @@ public class CreateAuctionDto
     [Required]
     public string Country {get; set;}
 
+    // Uploaded photos as data URIs. The first is the cover (mirrored to ImageUrl).
+    public List<string> Images {get; set;} = new();
+
     // Condition & fault disclosure. Required so sellers cannot list a vehicle
     // without stating its known condition — a core anti-deception safeguard.
     [Required]

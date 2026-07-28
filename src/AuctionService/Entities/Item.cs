@@ -14,6 +14,8 @@ public class Items
     public string ImageUrl {get; set;}
     public string Country {get; set;} = "";
     public string Description {get; set;} = "";
+    // All uploaded photos (data URIs); ImageUrl is the cover (first) image.
+    public List<string> Images {get; set;} = new();
 
 
 

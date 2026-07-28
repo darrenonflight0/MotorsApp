@@ -67,10 +67,25 @@ public class AuctionsController : ControllerBase
             return BadRequest("Reserve price out of range");
         }
 
-        if (!Uri.TryCreate(auctionDto.ImageUrl, UriKind.Absolute, out var imageUri)
-            || (imageUri.Scheme != Uri.UriSchemeHttp && imageUri.Scheme != Uri.UriSchemeHttps))
+        // Photos: sellers upload images (data URIs) rather than pasting URLs. Use
+        // the first uploaded image as the cover when one isn't set explicitly.
+        auctionDto.Images ??= new List<string>();
+        if (string.IsNullOrWhiteSpace(auctionDto.ImageUrl) && auctionDto.Images.Count > 0)
         {
-            return BadRequest("Image URL must be an absolute http(s) URL");
+            auctionDto.ImageUrl = auctionDto.Images[0];
+        }
+        if (string.IsNullOrWhiteSpace(auctionDto.ImageUrl))
+        {
+            return BadRequest("At least one photo of the car is required");
+        }
+
+        var cover = auctionDto.ImageUrl;
+        var isUpload = cover.StartsWith("data:image/", StringComparison.OrdinalIgnoreCase);
+        var isHttp = Uri.TryCreate(cover, UriKind.Absolute, out var imageUri)
+                     && (imageUri.Scheme == Uri.UriSchemeHttp || imageUri.Scheme == Uri.UriSchemeHttps);
+        if (!isUpload && !isHttp)
+        {
+            return BadRequest("The cover photo must be an uploaded image.");
         }
 
         var auction = _mapper.Map<Auction>(auctionDto);

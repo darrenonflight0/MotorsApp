@@ -12,6 +12,11 @@ const nextConfig = {
       },
     ],
   },
+  experimental: {
+    // Car listings carry several uploaded photos (compressed data URIs) through
+    // server actions; raise the default 1 MB body limit to accommodate them.
+    serverActions: { bodySizeLimit: '8mb' },
+  },
 };
 
 export default nextConfig;

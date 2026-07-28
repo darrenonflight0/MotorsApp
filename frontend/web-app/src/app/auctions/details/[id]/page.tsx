@@ -3,8 +3,8 @@ import { getDetailedViewData } from '@/app/actions/auctionActions';
 import { getPublicProfile } from '@/app/actions/verificationActions';
 import Heading from '@/app/components/Heading';
 import CountdownTimer from '@/app/components/CountdownTimer';
-import CarImage from '@/app/components/CarImage';
 import VerifiedBadge from '@/app/components/VerifiedBadge';
+import Gallery from './Gallery';
 import Link from 'next/link';
 import DetailedSpecs from './DetailedSpecs';
 import BidList from './BidList';
@@ -54,9 +54,10 @@ export default async function Details({ params }: { params: { id: string } }) {
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-chrome/80 bg-ink shadow-lot">
-          <CarImage imageUrl={auction.imageUrl} />
-        </div>
+        <Gallery
+          images={auction.images && auction.images.length ? auction.images : [auction.imageUrl]}
+          alt={`${auction.make} ${auction.model}`}
+        />
         <div className="rounded-xl border border-chrome/80 bg-paper-raised p-5 shadow-lot">
           <CountdownTimer auctionEnd={auction.auctionEnd} size="lg" />
           <div className="mt-5">

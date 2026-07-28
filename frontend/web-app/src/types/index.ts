@@ -26,6 +26,7 @@ export type Auction = {
   imageUrl: string;
   country?: string;
   description?: string;
+  images?: string[];
 };
 
 export type Bid = {
