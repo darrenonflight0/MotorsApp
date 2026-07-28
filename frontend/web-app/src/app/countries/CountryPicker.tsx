@@ -3,18 +3,20 @@
 import { useParamsStore } from '@/hooks/useParamsStore';
 import { useShallow } from 'zustand/react/shallow';
 import { useState } from 'react';
+import { HiBadgeCheck } from 'react-icons/hi';
 import Listings from '../auctions/Listings';
 import FallbackImage from '../components/FallbackImage';
 
 // value must match the Country stored on the backend Item.
 // `code` is the flagcdn ISO code; FX rates are indicative, not live.
+// Each market is served by ONE official Yamkela Motors distributor.
 const countries = [
-  { name: 'Ghana', value: 'Ghana', code: 'gh', blurb: 'West Africa hub · Tema port', ccy: 'GHS', symbol: '₵', perUsd: 15.8 },
-  { name: 'China', value: 'China', code: 'cn', blurb: 'New & used EVs · Shanghai', ccy: 'CNY', symbol: '¥', perUsd: 7.1 },
-  { name: 'Japan', value: 'Japan', code: 'jp', blurb: 'JDM classics · Yokohama', ccy: 'JPY', symbol: '¥', perUsd: 150 },
-  { name: 'USA', value: 'USA', code: 'us', blurb: 'Muscle & trucks · New York', ccy: 'USD', symbol: '$', perUsd: 1 },
-  { name: 'Canada', value: 'Canada', code: 'ca', blurb: 'Low-rust imports · Halifax', ccy: 'CAD', symbol: 'C$', perUsd: 1.36 },
-  { name: 'South Africa', value: 'South Africa', code: 'za', blurb: 'RHD market · Durban', ccy: 'ZAR', symbol: 'R', perUsd: 18.3 },
+  { name: 'Ghana', value: 'Ghana', code: 'gh', blurb: 'West Africa hub · Tema port', ccy: 'GHS', symbol: '₵', perUsd: 15.8, distributor: { name: 'Accra Auto Exports', since: 2019, port: 'Tema' } },
+  { name: 'China', value: 'China', code: 'cn', blurb: 'New & used EVs · Shanghai', ccy: 'CNY', symbol: '¥', perUsd: 7.1, distributor: { name: 'Shanghai EV Collective', since: 2021, port: 'Shanghai' } },
+  { name: 'Japan', value: 'Japan', code: 'jp', blurb: 'JDM classics · Yokohama', ccy: 'JPY', symbol: '¥', perUsd: 150, distributor: { name: 'Yokohama JDM Traders', since: 2016, port: 'Yokohama' } },
+  { name: 'USA', value: 'USA', code: 'us', blurb: 'Muscle & trucks · New York', ccy: 'USD', symbol: '$', perUsd: 1, distributor: { name: 'Liberty Motors Group', since: 2018, port: 'New York' } },
+  { name: 'Canada', value: 'Canada', code: 'ca', blurb: 'Low-rust imports · Halifax', ccy: 'CAD', symbol: 'C$', perUsd: 1.36, distributor: { name: 'Maple Fleet Imports', since: 2020, port: 'Halifax' } },
+  { name: 'South Africa', value: 'South Africa', code: 'za', blurb: 'RHD market · Durban', ccy: 'ZAR', symbol: 'R', perUsd: 18.3, distributor: { name: 'Durban Coastal Motors', since: 2017, port: 'Durban' } },
 ];
 
 export default function CountryPicker() {
@@ -68,6 +70,9 @@ export default function CountryPicker() {
                 <div className="bg-paper-raised p-4">
                   <span className="font-display text-lg font-bold text-ink">{c.name}</span>
                   <span className="mt-0.5 block text-xs text-asphalt">{c.blurb}</span>
+                  <span className="mt-1.5 block truncate text-[11px] font-medium text-chrome-dark">
+                    via {c.distributor.name}
+                  </span>
                 </div>
               </button>
             );
@@ -89,6 +94,24 @@ export default function CountryPicker() {
             </button>
           )}
         </div>
+
+        {selected && (
+          <div className="mb-4 flex items-center gap-4 rounded-xl border border-sky-500/30 bg-sky-500/5 p-4 shadow-lot">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-ink font-display text-lg font-black text-paper">
+              {selected.distributor.name.split(' ').map((w) => w[0]).slice(0, 2).join('')}
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="font-display font-bold text-ink">{selected.distributor.name}</span>
+                <HiBadgeCheck className="h-4 w-4 shrink-0 text-sky-500" title="Official distributor" />
+              </div>
+              <p className="text-xs text-asphalt">
+                Official Yamkela Motors distributor for {selected.name} since {selected.distributor.since} ·
+                ships from {selected.distributor.port}
+              </p>
+            </div>
+          </div>
+        )}
 
         {selected && (
           <div className="mb-6 flex flex-wrap items-center gap-3 rounded-xl border border-chrome/80 bg-paper-raised p-4 shadow-lot">
