@@ -40,7 +40,7 @@ export default function AboutPage() {
         {stats.map((s) => (
           <div
             key={s.label}
-            className="rounded-xl border border-chrome/80 bg-paper-raised p-6 text-center shadow-lot"
+            className="rounded-xl border border-line/80 bg-surface p-6 text-center shadow-lot"
           >
             <div className="readout text-4xl font-bold text-redline">{s.value}</div>
             <div className="eyebrow mt-2">{s.label}</div>
@@ -51,23 +51,23 @@ export default function AboutPage() {
       <section className="mb-12 grid gap-8 lg:grid-cols-[1.2fr_1fr]">
         <div>
           <span className="eyebrow">Our story</span>
-          <h2 className="mt-1 font-display text-2xl font-bold tracking-tight text-ink">
+          <h2 className="mt-1 font-display text-2xl font-bold tracking-tight text-fg">
             Built for buyers who can&apos;t stand next to the car
           </h2>
-          <p className="mt-3 leading-relaxed text-asphalt">
+          <p className="mt-3 leading-relaxed text-muted">
             Importing a vehicle used to mean trusting a stranger with your money and hoping the
             car matched the photos. Yamkela was built to remove that leap of faith. We combine a
             transparent live auction, a tamper-evident bidding ledger, escrow-held payments and a
             single logistics desk that moves your car from the auction block to your destination
             port.
           </p>
-          <p className="mt-3 leading-relaxed text-asphalt">
+          <p className="mt-3 leading-relaxed text-muted">
             Whether you are a first-time importer or a dealer moving volume, you get the same
             protection: verified identities, signed bids, and money that only changes hands when
             you say the car has arrived.
           </p>
         </div>
-        <div className="aspect-[5/4] overflow-hidden rounded-xl border border-chrome/80 bg-ink shadow-lot">
+        <div className="aspect-[5/4] overflow-hidden rounded-xl border border-line/80 bg-ink shadow-lot">
           <FallbackImage
             src="https://loremflickr.com/700/560/cars,port,shipping?lock=5"
             alt="Vehicles staged at an export port"
@@ -78,17 +78,17 @@ export default function AboutPage() {
 
       <section className="mb-4">
         <span className="eyebrow">What we stand for</span>
-        <h2 className="mt-1 mb-5 font-display text-2xl font-bold tracking-tight text-ink">
+        <h2 className="mt-1 mb-5 font-display text-2xl font-bold tracking-tight text-fg">
           Our principles
         </h2>
         <div className="grid gap-6 md:grid-cols-3">
           {values.map((v) => (
             <div
               key={v.title}
-              className="rounded-xl border border-chrome/80 bg-paper-raised p-6 shadow-lot"
+              className="rounded-xl border border-line/80 bg-surface p-6 shadow-lot"
             >
-              <h3 className="font-display font-bold text-ink">{v.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-asphalt">{v.body}</p>
+              <h3 className="font-display font-bold text-fg">{v.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted">{v.body}</p>
             </div>
           ))}
         </div>

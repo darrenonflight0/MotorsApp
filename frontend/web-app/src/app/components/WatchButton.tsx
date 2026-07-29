@@ -24,8 +24,8 @@ export default function WatchButton({ auction, variant = 'overlay' }: Props) {
 
   const base =
     variant === 'overlay'
-      ? 'absolute right-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full bg-paper-raised/90 shadow-sm backdrop-blur transition-colors hover:bg-paper-raised'
-      : 'inline-grid h-10 w-10 place-items-center rounded-lg border border-chrome-dark/25 transition-colors hover:border-redline';
+      ? 'absolute right-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full bg-surface/90 shadow-sm backdrop-blur transition-colors hover:bg-surface'
+      : 'inline-grid h-10 w-10 place-items-center rounded-lg border border-line/25 transition-colors hover:border-redline';
 
   return (
     <button
@@ -50,7 +50,7 @@ export default function WatchButton({ auction, variant = 'overlay' }: Props) {
         {watched ? (
           <AiFillHeart className="text-redline" size={18} />
         ) : (
-          <AiOutlineHeart className="text-ink" size={18} />
+          <AiOutlineHeart className="text-fg" size={18} />
         )}
       </motion.span>
     </button>

@@ -56,8 +56,8 @@ function VerifiedState() {
         >
           <HiBadgeCheck className="mx-auto h-16 w-16 text-sky-500" />
         </motion.div>
-        <h1 className="mt-4 font-display text-2xl font-bold text-ink">You&apos;re a verified auctioneer</h1>
-        <p className="mt-2 text-sm text-asphalt">
+        <h1 className="mt-4 font-display text-2xl font-bold text-fg">You&apos;re a verified auctioneer</h1>
+        <p className="mt-2 text-sm text-muted">
           The blue tick now shows next to your name. You can list cars for auction.
         </p>
         <Link href="/auctions/create" className="btn-primary mt-6 inline-block">List a car</Link>
@@ -80,8 +80,8 @@ function PendingState() {
         >
           <HiClock className="mx-auto h-14 w-14 text-amber-500" />
         </motion.div>
-        <h1 className="mt-4 font-display text-2xl font-bold text-ink">Under review</h1>
-        <p className="mt-2 text-sm text-asphalt">
+        <h1 className="mt-4 font-display text-2xl font-bold text-fg">Under review</h1>
+        <p className="mt-2 text-sm text-muted">
           Our team is reviewing your identity documents. You&apos;ll get the blue tick as soon as
           you&apos;re approved — usually within a day.
         </p>
@@ -203,10 +203,10 @@ function Wizard({
           transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
         >
           {step === 'intro' && (
-            <div className="rounded-2xl border border-chrome/80 bg-paper-raised p-6 shadow-lot">
+            <div className="rounded-2xl border border-line/80 bg-surface p-6 shadow-lot">
               <HiOutlineIdentification className="h-12 w-12 text-redline" />
-              <h1 className="mt-3 font-display text-2xl font-bold text-ink">Verify to sell</h1>
-              <p className="mt-2 text-sm leading-relaxed text-asphalt">
+              <h1 className="mt-3 font-display text-2xl font-bold text-fg">Verify to sell</h1>
+              <p className="mt-2 text-sm leading-relaxed text-muted">
                 To protect buyers, sellers are identity-verified before listing a car. It takes a
                 minute: a quick selfie and a photo of your ID. An admin reviews it, then you get the
                 blue tick.
@@ -216,7 +216,7 @@ function Wizard({
                   Your last application was declined: {rejectedReason}
                 </p>
               )}
-              <p className="mt-3 text-xs text-chrome-dark">
+              <p className="mt-3 text-xs text-muted">
                 Your documents are used only for verification and reviewed by our team. See our{' '}
                 <Link href="/privacy" className="text-redline hover:underline">Privacy Policy</Link>.
               </p>
@@ -272,9 +272,9 @@ function Wizard({
           )}
 
           {step === 'review' && (
-            <div className="rounded-2xl border border-chrome/80 bg-paper-raised p-6 shadow-lot">
-              <h1 className="font-display text-2xl font-bold text-ink">Review &amp; submit</h1>
-              <p className="mt-1 text-sm text-asphalt">Confirm your photos are clear before submitting.</p>
+            <div className="rounded-2xl border border-line/80 bg-surface p-6 shadow-lot">
+              <h1 className="font-display text-2xl font-bold text-fg">Review &amp; submit</h1>
+              <p className="mt-1 text-sm text-muted">Confirm your photos are clear before submitting.</p>
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <Thumb label="Selfie" src={selfie} />
                 <Thumb label={idType} src={idImage} />
@@ -302,9 +302,9 @@ function CaptureCard({
   nextEnabled: boolean; rounded?: boolean; uploadSlot?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-chrome/80 bg-paper-raised p-5 shadow-lot">
-      <h1 className="font-display text-xl font-bold text-ink">{title}</h1>
-      <p className="mt-1 text-sm text-asphalt">{hint}</p>
+    <div className="rounded-2xl border border-line/80 bg-surface p-5 shadow-lot">
+      <h1 className="font-display text-xl font-bold text-fg">{title}</h1>
+      <p className="mt-1 text-sm text-muted">{hint}</p>
 
       <div className={`relative mt-4 aspect-[4/3] overflow-hidden bg-ink ${rounded ? 'rounded-full aspect-square mx-auto w-64' : 'rounded-xl'}`}>
         {image ? (
@@ -344,12 +344,12 @@ function CaptureCard({
 function Thumb({ label, src }: { label: string; src: string | null }) {
   return (
     <div>
-      <div className="aspect-square overflow-hidden rounded-xl border border-chrome/70 bg-ink">
+      <div className="aspect-square overflow-hidden rounded-xl border border-line/70 bg-ink">
         {src && /* eslint-disable-next-line @next/next/no-img-element */ (
           <img src={src} alt={label} className="h-full w-full object-cover" />
         )}
       </div>
-      <p className="mt-1 text-center text-xs font-medium text-asphalt">{label}</p>
+      <p className="mt-1 text-center text-xs font-medium text-muted">{label}</p>
     </div>
   );
 }

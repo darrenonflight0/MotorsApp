@@ -36,7 +36,7 @@ export default function VerifiedBadge({ verified, variant = 'tick', size = 'md',
     </span>
   ) : (
     <span
-      className={`inline-flex items-center gap-1 rounded-full bg-chrome/60 px-2 py-0.5 text-xs font-semibold text-asphalt ${className}`}
+      className={`inline-flex items-center gap-1 rounded-full bg-line/60 px-2 py-0.5 text-xs font-semibold text-muted ${className}`}
     >
       Unverified
     </span>

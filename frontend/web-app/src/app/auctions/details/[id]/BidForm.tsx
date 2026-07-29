@@ -40,22 +40,22 @@ export default function BidForm({ auctionId, highBid }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="rounded-xl border border-chrome bg-paper-raised p-4 shadow-lot">
+    <form onSubmit={handleSubmit(onSubmit)} className="rounded-xl border border-line bg-surface p-4 shadow-lot">
       <div className="flex items-center justify-between">
         <span className="eyebrow">Place your bid</span>
-        <span className="readout text-xs text-asphalt">
-          Min next <span className="font-bold text-ink">${numberWithCommas(minNext)}</span>
+        <span className="readout text-xs text-muted">
+          Min next <span className="font-bold text-fg">${numberWithCommas(minNext)}</span>
         </span>
       </div>
 
       <div className="mt-3 flex items-stretch gap-2">
-        <div className="flex flex-1 items-center rounded-lg border border-chrome-dark/30 bg-white px-3 focus-within:border-redline">
-          <span className="readout text-lg font-bold text-asphalt">$</span>
+        <div className="flex flex-1 items-center rounded-lg border border-line/30 bg-surface px-3 focus-within:border-redline">
+          <span className="readout text-lg font-bold text-muted">$</span>
           <input
             type="number"
             inputMode="numeric"
             {...register('amount', { required: true, min: minNext })}
-            className="readout w-full bg-transparent px-2 py-3 text-lg font-bold text-ink outline-none"
+            className="readout w-full bg-transparent px-2 py-3 text-lg font-bold text-fg outline-none"
             placeholder={numberWithCommas(minNext)}
           />
         </div>
@@ -75,7 +75,7 @@ export default function BidForm({ auctionId, highBid }: Props) {
             key={q}
             type="button"
             onClick={() => quickAdd(q)}
-            className="readout rounded-md border border-chrome bg-paper px-3 py-1 text-sm font-semibold text-ink transition-colors hover:border-redline hover:text-redline"
+            className="readout rounded-md border border-line bg-canvas px-3 py-1 text-sm font-semibold text-fg transition-colors hover:border-redline hover:text-redline"
           >
             +${q}
           </button>

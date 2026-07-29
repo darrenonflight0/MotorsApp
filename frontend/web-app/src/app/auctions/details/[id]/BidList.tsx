@@ -50,21 +50,21 @@ export default function BidList({ user, auction }: Props) {
 
   if (loading) {
     return (
-      <div className="animate-pulse rounded-xl border border-chrome/80 bg-paper-raised p-4 shadow-lot">
-        <div className="h-5 w-24 rounded bg-chrome/50" />
-        <div className="mt-4 h-10 w-full rounded bg-chrome/40" />
-        <div className="mt-2 h-10 w-full rounded bg-chrome/40" />
+      <div className="animate-pulse rounded-xl border border-line/80 bg-surface p-4 shadow-lot">
+        <div className="h-5 w-24 rounded bg-line/50" />
+        <div className="mt-4 h-10 w-full rounded bg-line/40" />
+        <div className="mt-2 h-10 w-full rounded bg-line/40" />
       </div>
     );
   }
 
   return (
-    <div className="rounded-xl border border-chrome/80 bg-paper-raised shadow-lot">
-      <div className="flex items-center justify-between border-b border-chrome/70 p-4">
+    <div className="rounded-xl border border-line/80 bg-surface shadow-lot">
+      <div className="flex items-center justify-between border-b border-line/70 p-4">
         <Heading title="Bids" />
         <div className="text-right">
           <span className="eyebrow">High bid</span>
-          <p className={`readout text-xl font-bold ${highBid > 0 ? 'text-redline' : 'text-asphalt'}`}>
+          <p className={`readout text-xl font-bold ${highBid > 0 ? 'text-redline' : 'text-muted'}`}>
             {highBid > 0 ? `$${numberWithCommas(highBid)}` : 'No bids yet'}
           </p>
         </div>
@@ -72,19 +72,19 @@ export default function BidList({ user, auction }: Props) {
 
       <div className="max-h-72 overflow-y-auto">
         {bids.length === 0 ? (
-          <div className="p-5 text-sm text-asphalt">Be the first to bid on this lot.</div>
+          <div className="p-5 text-sm text-muted">Be the first to bid on this lot.</div>
         ) : (
           bids.map((bid) => <BidItem key={bid.id} bid={bid} />)
         )}
       </div>
 
-      <div className="border-t border-chrome/70 p-4">
+      <div className="border-t border-line/70 p-4">
         {auctionFinished ? (
-          <span className="text-sm font-semibold text-asphalt">This auction has finished</span>
+          <span className="text-sm font-semibold text-muted">This auction has finished</span>
         ) : !user ? (
-          <span className="text-sm text-asphalt">Please log in to place a bid</span>
+          <span className="text-sm text-muted">Please log in to place a bid</span>
         ) : user.username === auction.seller ? (
-          <span className="text-sm text-asphalt">You cannot bid on your own auction</span>
+          <span className="text-sm text-muted">You cannot bid on your own auction</span>
         ) : (
           canBid && <BidForm auctionId={auction.id} highBid={highBid} />
         )}

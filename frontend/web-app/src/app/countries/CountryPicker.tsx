@@ -54,7 +54,7 @@ export default function CountryPicker() {
                 className={`group overflow-hidden rounded-xl border text-left transition-all hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-redline ${
                   active
                     ? 'border-redline shadow-lot-hover'
-                    : 'border-chrome/80 shadow-lot hover:border-chrome-dark/40'
+                    : 'border-line/80 shadow-lot hover:border-line/40'
                 }`}
               >
                 <div className="relative aspect-[16/9] w-full overflow-hidden bg-ink">
@@ -67,10 +67,10 @@ export default function CountryPicker() {
                     {c.symbol} {c.ccy}
                   </span>
                 </div>
-                <div className="bg-paper-raised p-4">
-                  <span className="font-display text-lg font-bold text-ink">{c.name}</span>
-                  <span className="mt-0.5 block text-xs text-asphalt">{c.blurb}</span>
-                  <span className="mt-1.5 block truncate text-[11px] font-medium text-chrome-dark">
+                <div className="bg-surface p-4">
+                  <span className="font-display text-lg font-bold text-fg">{c.name}</span>
+                  <span className="mt-0.5 block text-xs text-muted">{c.blurb}</span>
+                  <span className="mt-1.5 block truncate text-[11px] font-medium text-muted">
                     via {c.distributor.name}
                   </span>
                 </div>
@@ -82,7 +82,7 @@ export default function CountryPicker() {
 
       <section id="country-lots" className="scroll-mt-24">
         <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
-          <h2 className="font-display text-2xl font-bold tracking-tight text-ink">
+          <h2 className="font-display text-2xl font-bold tracking-tight text-fg">
             {country ? `Vehicles from ${country}` : 'Select a country to view its inventory'}
           </h2>
           {country && (
@@ -102,10 +102,10 @@ export default function CountryPicker() {
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className="font-display font-bold text-ink">{selected.distributor.name}</span>
+                <span className="font-display font-bold text-fg">{selected.distributor.name}</span>
                 <HiBadgeCheck className="h-4 w-4 shrink-0 text-sky-500" title="Official distributor" />
               </div>
-              <p className="text-xs text-asphalt">
+              <p className="text-xs text-muted">
                 Official Yamkela Motors distributor for {selected.name} since {selected.distributor.since} ·
                 ships from {selected.distributor.port}
               </p>
@@ -114,10 +114,10 @@ export default function CountryPicker() {
         )}
 
         {selected && (
-          <div className="mb-6 flex flex-wrap items-center gap-3 rounded-xl border border-chrome/80 bg-paper-raised p-4 shadow-lot">
+          <div className="mb-6 flex flex-wrap items-center gap-3 rounded-xl border border-line/80 bg-surface p-4 shadow-lot">
             <span className="eyebrow shrink-0">Currency converter</span>
             <div className="flex items-center gap-2">
-              <span className="readout text-sm text-asphalt">US$</span>
+              <span className="readout text-sm text-muted">US$</span>
               <input
                 type="number"
                 value={usd}
@@ -126,11 +126,11 @@ export default function CountryPicker() {
                 className="field-input readout w-32 !py-1.5"
               />
             </div>
-            <span className="readout text-asphalt">≈</span>
-            <span className="readout text-lg font-bold text-ink">
-              {selected.symbol} {converted} <span className="text-sm font-medium text-asphalt">{selected.ccy}</span>
+            <span className="readout text-muted">≈</span>
+            <span className="readout text-lg font-bold text-fg">
+              {selected.symbol} {converted} <span className="text-sm font-medium text-muted">{selected.ccy}</span>
             </span>
-            <span className="w-full text-xs text-asphalt sm:w-auto sm:border-l sm:border-chrome/70 sm:pl-3">
+            <span className="w-full text-xs text-muted sm:w-auto sm:border-l sm:border-line/70 sm:pl-3">
               Indicative rate. Bids and settlement are processed in US dollars.
             </span>
           </div>
@@ -139,7 +139,7 @@ export default function CountryPicker() {
         {country ? (
           <Listings />
         ) : (
-          <div className="rounded-xl border border-dashed border-chrome-dark/30 bg-paper-raised/60 p-12 text-center text-asphalt">
+          <div className="rounded-xl border border-dashed border-line/30 bg-surface/60 p-12 text-center text-muted">
             Pick a source market above to browse cars available for export from there.
           </div>
         )}

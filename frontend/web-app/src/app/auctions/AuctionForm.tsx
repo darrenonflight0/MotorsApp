@@ -158,7 +158,7 @@ export default function AuctionForm({ auction }: Props) {
               placeholder="Describe the car's condition honestly — service history, accident history, mechanical issues, cosmetic wear, and anything a buyer should know before bidding."
               className="field-input resize-y"
             />
-            <p className="mt-1 text-xs text-asphalt">
+            <p className="mt-1 text-xs text-muted">
               Required. Accurate disclosure protects you and the buyer — misleading listings breach
               our{' '}
               <a href="/terms" className="font-medium text-redline hover:text-redline-deep" target="_blank">

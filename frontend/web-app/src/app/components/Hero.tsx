@@ -80,14 +80,14 @@ export default async function Hero() {
             </a>
             <a
               href="/auctions/create"
-              className="inline-flex items-center rounded-lg border border-chrome-dark px-5 py-3 font-display text-sm font-bold uppercase tracking-wide text-paper transition-colors hover:border-chrome hover:bg-white/5"
+              className="inline-flex items-center rounded-lg border border-line px-5 py-3 font-display text-sm font-bold uppercase tracking-wide text-paper transition-colors hover:border-line hover:bg-white/5"
             >
               Sell your car
             </a>
           </div>
         </div>
 
-        <div className="flex flex-col justify-center gap-5 lg:border-l lg:border-chrome-dark/60 lg:pl-10">
+        <div className="flex flex-col justify-center gap-5 lg:border-l lg:border-line/60 lg:pl-10">
           <Stat value={liveCount} label="Lots live now" tone="live" />
           <Stat value={endingSoon} label="Ending within 6 hours" tone="soon" />
         </div>

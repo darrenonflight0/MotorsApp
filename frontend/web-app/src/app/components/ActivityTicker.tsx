@@ -21,7 +21,7 @@ export default function ActivityTicker() {
   const latest = activity[0];
 
   return (
-    <div className="mb-8 flex items-center gap-3 rounded-full border border-chrome/80 bg-paper-raised px-4 py-2 shadow-lot">
+    <div className="mb-8 flex items-center gap-3 rounded-full border border-line/80 bg-surface px-4 py-2 shadow-lot">
       <span className="relative flex h-2 w-2 shrink-0">
         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-racing opacity-75" />
         <span className="relative inline-flex h-2 w-2 rounded-full bg-racing" />
@@ -35,14 +35,14 @@ export default function ActivityTicker() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3 }}
-            className="truncate text-sm text-ink"
+            className="truncate text-sm text-fg"
           >
             <Link href={`/auctions/details/${latest.auctionId}`} className="hover:text-redline">
               <span className="font-display font-semibold">{latest.bidder}</span> bid{' '}
               <span className="readout font-bold text-redline">
                 ${numberWithCommas(latest.amount)}
               </span>{' '}
-              <span className="text-asphalt">· {ago(latest.at)}</span>
+              <span className="text-muted">· {ago(latest.at)}</span>
             </Link>
           </motion.div>
         </AnimatePresence>

@@ -100,10 +100,10 @@ function BrandTile({
       onClick={onPick}
       aria-pressed={active}
       title={ev ? `${name} — electric / new energy` : name}
-      className={`group relative flex aspect-square w-24 shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-xl border bg-paper-raised p-3 transition-all hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-redline sm:w-auto ${
+      className={`group relative flex aspect-square w-24 shrink-0 snap-start flex-col items-center justify-center gap-2 rounded-xl border bg-surface p-3 transition-all hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-redline sm:w-auto ${
         active
           ? 'border-redline shadow-lot-hover'
-          : 'border-chrome/80 shadow-lot hover:border-chrome-dark/40'
+          : 'border-line/80 shadow-lot hover:border-line/40'
       }`}
     >
       {ev && (
@@ -126,11 +126,11 @@ function BrandTile({
           className="h-8 w-8 object-contain opacity-80 transition-opacity group-hover:opacity-100"
         />
       ) : (
-        <span className="flex h-8 items-center font-display text-base font-black text-chrome-dark">
+        <span className="flex h-8 items-center font-display text-base font-black text-muted">
           {name.slice(0, 2).toUpperCase()}
         </span>
       )}
-      <span className="line-clamp-1 text-center font-display text-[11px] font-semibold text-asphalt group-hover:text-ink">
+      <span className="line-clamp-1 text-center font-display text-[11px] font-semibold text-muted group-hover:text-fg">
         {name}
       </span>
     </button>
@@ -156,7 +156,7 @@ export default function BrowseByBrand() {
       <div className="mb-4 flex items-end justify-between">
         <div>
           <span className="eyebrow">Browse by marque</span>
-          <h2 className="mt-1 font-display text-2xl font-bold tracking-tight text-ink">
+          <h2 className="mt-1 font-display text-2xl font-bold tracking-tight text-fg">
             Shop by brand
           </h2>
         </div>

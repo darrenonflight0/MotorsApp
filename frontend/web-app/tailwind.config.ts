@@ -28,6 +28,12 @@ const config: Config = {
         },
         asphalt: "rgb(var(--asphalt-rgb) / <alpha-value>)",
         racing: "rgb(var(--racing-rgb) / <alpha-value>)",
+        /* Theme-able role tokens (flip in dark mode) */
+        canvas: "rgb(var(--canvas-rgb) / <alpha-value>)",
+        surface: "rgb(var(--surface-rgb) / <alpha-value>)",
+        fg: "rgb(var(--fg-rgb) / <alpha-value>)",
+        muted: "rgb(var(--muted-rgb) / <alpha-value>)",
+        line: "rgb(var(--line-rgb) / <alpha-value>)",
       },
       fontFamily: {
         display: ["var(--font-display)", "system-ui", "sans-serif"],

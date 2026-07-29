@@ -61,12 +61,12 @@ export default function ImageUploader({ value, onChange, max = 6 }: Props) {
         onDragLeave={() => setDragging(false)}
         onDrop={(e) => { e.preventDefault(); setDragging(false); addFiles(e.dataTransfer.files); }}
         className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 text-center transition-colors ${
-          dragging ? 'border-redline bg-redline/5' : 'border-chrome/80 bg-paper hover:border-chrome-dark/50'
+          dragging ? 'border-redline bg-redline/5' : 'border-line/80 bg-canvas hover:border-line/50'
         }`}
       >
-        <HiOutlinePhotograph className="h-8 w-8 text-chrome-dark" />
-        <p className="mt-2 text-sm font-medium text-ink">Tap to add photos</p>
-        <p className="text-xs text-asphalt">or drag, drop, or paste — up to {max}</p>
+        <HiOutlinePhotograph className="h-8 w-8 text-muted" />
+        <p className="mt-2 text-sm font-medium text-fg">Tap to add photos</p>
+        <p className="text-xs text-muted">or drag, drop, or paste — up to {max}</p>
         <input
           ref={inputRef}
           type="file"
@@ -87,7 +87,7 @@ export default function ImageUploader({ value, onChange, max = 6 }: Props) {
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
-                className="group relative aspect-square overflow-hidden rounded-lg border border-chrome/70 bg-ink"
+                className="group relative aspect-square overflow-hidden rounded-lg border border-line/70 bg-ink"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={src} alt={`photo ${i + 1}`} className="h-full w-full object-cover" />

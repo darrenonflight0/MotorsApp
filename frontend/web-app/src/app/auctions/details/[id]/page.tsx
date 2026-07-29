@@ -41,11 +41,11 @@ export default async function Details({ params }: { params: { id: string } }) {
       </div>
 
       {/* Auctioneer verification status — shown on every listing */}
-      <div className="mb-6 flex flex-wrap items-center gap-2 text-sm text-asphalt">
+      <div className="mb-6 flex flex-wrap items-center gap-2 text-sm text-muted">
         <span>Sold by</span>
         <Link
           href={`/users/${encodeURIComponent(auction.seller)}`}
-          className="inline-flex items-center gap-1 font-display font-semibold text-ink hover:text-redline"
+          className="inline-flex items-center gap-1 font-display font-semibold text-fg hover:text-redline"
         >
           @{auction.seller}
           <VerifiedBadge verified={sellerVerified} size="sm" />
@@ -58,7 +58,7 @@ export default async function Details({ params }: { params: { id: string } }) {
           images={auction.images && auction.images.length ? auction.images : [auction.imageUrl]}
           alt={`${auction.make} ${auction.model}`}
         />
-        <div className="rounded-xl border border-chrome/80 bg-paper-raised p-5 shadow-lot">
+        <div className="rounded-xl border border-line/80 bg-surface p-5 shadow-lot">
           <CountdownTimer auctionEnd={auction.auctionEnd} size="lg" />
           <div className="mt-5">
             <DetailedSpecs auction={auction} />
@@ -66,19 +66,19 @@ export default async function Details({ params }: { params: { id: string } }) {
         </div>
       </div>
 
-      <section className="mt-8 max-w-5xl rounded-xl border border-chrome/80 bg-paper-raised p-5 shadow-lot">
+      <section className="mt-8 max-w-5xl rounded-xl border border-line/80 bg-surface p-5 shadow-lot">
         <div className="flex items-baseline justify-between gap-3">
-          <h2 className="font-display text-lg font-bold tracking-tight text-ink">
+          <h2 className="font-display text-lg font-bold tracking-tight text-fg">
             Condition &amp; disclosures
           </h2>
           <span className="eyebrow shrink-0">Seller-declared</span>
         </div>
-        <p className="mt-3 whitespace-pre-line leading-relaxed text-asphalt [text-wrap:pretty]">
+        <p className="mt-3 whitespace-pre-line leading-relaxed text-muted [text-wrap:pretty]">
           {auction.description?.trim()
             ? auction.description
             : 'The seller has not provided a condition statement for this vehicle.'}
         </p>
-        <p className="mt-4 border-t border-chrome/60 pt-3 text-xs leading-relaxed text-chrome-dark">
+        <p className="mt-4 border-t border-line/60 pt-3 text-xs leading-relaxed text-muted">
           This description is provided by the seller. Yamkela Motors is a marketplace facilitator
           and does not independently verify vehicle condition — review all disclosures and our{' '}
           <Link href="/terms" className="font-medium text-redline hover:text-redline-deep">

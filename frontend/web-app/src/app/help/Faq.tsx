@@ -33,7 +33,7 @@ export default function Faq() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <div className="divide-y divide-chrome/70 overflow-hidden rounded-xl border border-chrome/80 bg-paper-raised shadow-lot">
+    <div className="divide-y divide-chrome/70 overflow-hidden rounded-xl border border-line/80 bg-surface shadow-lot">
       {faqs.map((f, i) => {
         const isOpen = open === i;
         return (
@@ -41,9 +41,9 @@ export default function Faq() {
             <button
               onClick={() => setOpen(isOpen ? null : i)}
               aria-expanded={isOpen}
-              className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors hover:bg-paper"
+              className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition-colors hover:bg-canvas"
             >
-              <span className="font-display font-semibold text-ink">{f.q}</span>
+              <span className="font-display font-semibold text-fg">{f.q}</span>
               <span
                 className={`readout shrink-0 text-xl text-redline transition-transform ${
                   isOpen ? 'rotate-45' : ''
@@ -54,7 +54,7 @@ export default function Faq() {
               </span>
             </button>
             {isOpen && (
-              <p className="px-5 pb-4 text-sm leading-relaxed text-asphalt">{f.a}</p>
+              <p className="px-5 pb-4 text-sm leading-relaxed text-muted">{f.a}</p>
             )}
           </div>
         );

@@ -38,7 +38,7 @@ export default function BrowseByType() {
     <section className="mb-10">
       <div className="mb-4">
         <span className="eyebrow">Browse by body style</span>
-        <h2 className="mt-1 font-display text-2xl font-bold tracking-tight text-ink">
+        <h2 className="mt-1 font-display text-2xl font-bold tracking-tight text-fg">
           What are you driving home?
         </h2>
       </div>
@@ -52,7 +52,7 @@ export default function BrowseByType() {
               onClick={() => pick(t.term)}
               aria-pressed={active}
               className={`group relative aspect-[4/3] overflow-hidden rounded-xl border text-left transition-all hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-redline ${
-                active ? 'border-redline shadow-lot-hover' : 'border-chrome/80 shadow-lot hover:border-chrome-dark/40'
+                active ? 'border-redline shadow-lot-hover' : 'border-line/80 shadow-lot hover:border-line/40'
               }`}
             >
               <FallbackImage

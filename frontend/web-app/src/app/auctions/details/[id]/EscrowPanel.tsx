@@ -36,7 +36,7 @@ const statusCopy: Record<Escrow['status'], { label: string; cls: string; hint: s
   },
   Refunded: {
     label: 'Refunded to buyer',
-    cls: 'bg-chrome/60 text-asphalt',
+    cls: 'bg-line/60 text-muted',
     hint: 'Dispute resolved with a refund to the buyer.',
   },
   Disputed: {
@@ -83,8 +83,8 @@ export default function EscrowPanel({ auctionId, username }: Props) {
   const status = statusCopy[escrow.status];
 
   return (
-    <div className="rounded-xl border border-chrome/80 bg-paper-raised shadow-lot">
-      <div className="flex items-center justify-between border-b border-chrome/70 p-4">
+    <div className="rounded-xl border border-line/80 bg-surface shadow-lot">
+      <div className="flex items-center justify-between border-b border-line/70 p-4">
         <Heading title="Escrow settlement" />
         <span className={`eyebrow rounded-full px-2.5 py-1 ${status.cls}`}>{status.label}</span>
       </div>
@@ -93,19 +93,19 @@ export default function EscrowPanel({ auctionId, username }: Props) {
         <div className="flex items-end justify-between">
           <div>
             <span className="eyebrow">Amount held</span>
-            <p className="readout text-2xl font-bold text-ink">${numberWithCommas(escrow.amount)}</p>
+            <p className="readout text-2xl font-bold text-fg">${numberWithCommas(escrow.amount)}</p>
           </div>
-          <div className="text-right text-sm text-asphalt">
+          <div className="text-right text-sm text-muted">
             <div>
-              Buyer <span className="font-display font-semibold text-ink">{escrow.buyer}</span>
+              Buyer <span className="font-display font-semibold text-fg">{escrow.buyer}</span>
             </div>
             <div>
-              Seller <span className="font-display font-semibold text-ink">{escrow.seller}</span>
+              Seller <span className="font-display font-semibold text-fg">{escrow.seller}</span>
             </div>
           </div>
         </div>
 
-        <p className="mt-3 text-sm text-asphalt">{status.hint}</p>
+        <p className="mt-3 text-sm text-muted">{status.hint}</p>
 
         <div className="mt-4 flex flex-wrap gap-3">
           {isBuyer && escrow.status === 'AwaitingDeposit' && (
@@ -148,7 +148,7 @@ export default function EscrowPanel({ auctionId, username }: Props) {
           )}
         </div>
 
-        <p className="mt-4 border-t border-chrome/70 pt-3 text-xs leading-relaxed text-asphalt">
+        <p className="mt-4 border-t border-line/70 pt-3 text-xs leading-relaxed text-muted">
           Never pay outside escrow. Yamkela staff will never ask you to transfer money
           directly, share your password, or settle by gift cards or crypto.
         </p>

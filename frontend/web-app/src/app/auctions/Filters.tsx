@@ -30,7 +30,7 @@ function Segment({ label, active, onClick }: SegmentProps) {
       className={`px-3.5 py-2 text-sm font-medium transition-colors first:rounded-l-lg last:rounded-r-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-redline ${
         active
           ? 'border border-ink bg-ink text-paper'
-          : 'border border-chrome/80 bg-paper-raised text-ink hover:border-chrome-dark/40 hover:text-redline'
+          : 'border border-line/80 bg-surface text-fg hover:border-line/40 hover:text-redline'
       }`}
     >
       {label}

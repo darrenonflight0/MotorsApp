@@ -58,7 +58,7 @@ export default function Loader({ label = 'Warming up the grid', fullscreen }: Pr
     <div
       className={
         fullscreen
-          ? 'fixed inset-0 z-[70] flex flex-col items-center justify-center gap-5 bg-paper'
+          ? 'fixed inset-0 z-[70] flex flex-col items-center justify-center gap-5 bg-canvas'
           : 'flex flex-col items-center justify-center gap-5 py-24'
       }
       role="status"
@@ -66,8 +66,8 @@ export default function Loader({ label = 'Warming up the grid', fullscreen }: Pr
     >
       <SpinnerDial />
       <div className="text-center">
-        <div className="font-display text-lg font-extrabold uppercase tracking-[0.08em] text-ink">
-          Yamkela<span className="ml-1.5 font-semibold text-asphalt">Motors</span>
+        <div className="font-display text-lg font-extrabold uppercase tracking-[0.08em] text-fg">
+          Yamkela<span className="ml-1.5 font-semibold text-muted">Motors</span>
         </div>
         <div className="loader-breathe eyebrow mt-1.5">{label}</div>
       </div>

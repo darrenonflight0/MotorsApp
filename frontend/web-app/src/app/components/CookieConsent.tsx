@@ -78,12 +78,12 @@ export default function CookieConsent() {
           initial={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed inset-x-3 bottom-3 z-[70] mx-auto max-w-3xl rounded-2xl border border-chrome/80 bg-paper-raised/95 p-5 shadow-lot-hover backdrop-blur sm:inset-x-6 sm:p-6"
+          className="fixed inset-x-3 bottom-3 z-[70] mx-auto max-w-3xl rounded-2xl border border-line/80 bg-surface/95 p-5 shadow-lot-hover backdrop-blur sm:inset-x-6 sm:p-6"
         >
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="max-w-xl">
-              <p className="font-display text-sm font-bold text-ink">We value your privacy</p>
-              <p className="mt-1 text-sm leading-relaxed text-asphalt">
+              <p className="font-display text-sm font-bold text-fg">We value your privacy</p>
+              <p className="mt-1 text-sm leading-relaxed text-muted">
                 We use strictly-necessary cookies to run Yamkela Motors (sign-in, security,
                 your watchlist). With your consent we also use optional analytics cookies to
                 understand how the marketplace is used. You can change your choice at any time.{' '}
@@ -99,7 +99,7 @@ export default function CookieConsent() {
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
-                    className="mt-4 flex items-center gap-3 overflow-hidden text-sm text-asphalt"
+                    className="mt-4 flex items-center gap-3 overflow-hidden text-sm text-muted"
                   >
                     <input
                       type="checkbox"
@@ -108,7 +108,7 @@ export default function CookieConsent() {
                       className="h-4 w-4 accent-redline"
                     />
                     <span>
-                      <span className="font-semibold text-ink">Analytics cookies</span> — help us
+                      <span className="font-semibold text-fg">Analytics cookies</span> — help us
                       improve the platform (optional, off by default).
                     </span>
                   </motion.label>
@@ -129,14 +129,14 @@ export default function CookieConsent() {
               {showPrefs ? (
                 <button
                   onClick={() => persist({ analytics })}
-                  className="text-sm font-medium text-asphalt underline-offset-2 hover:text-ink hover:underline"
+                  className="text-sm font-medium text-muted underline-offset-2 hover:text-fg hover:underline"
                 >
                   Save choices
                 </button>
               ) : (
                 <button
                   onClick={() => setShowPrefs(true)}
-                  className="text-sm font-medium text-asphalt underline-offset-2 hover:text-ink hover:underline"
+                  className="text-sm font-medium text-muted underline-offset-2 hover:text-fg hover:underline"
                 >
                   Preferences
                 </button>

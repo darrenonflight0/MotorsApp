@@ -20,10 +20,10 @@ export default function WatchlistView() {
 
   if (lots.length === 0) {
     return (
-      <div className="flex h-[45vh] flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-chrome-dark/30 bg-paper-raised/60 text-center">
+      <div className="flex h-[45vh] flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-line/30 bg-surface/60 text-center">
         <AiFillHeart className="text-chrome" size={40} />
-        <p className="font-display text-lg font-bold text-ink">Your watchlist is empty</p>
-        <p className="max-w-sm text-sm text-asphalt">
+        <p className="font-display text-lg font-bold text-fg">Your watchlist is empty</p>
+        <p className="max-w-sm text-sm text-muted">
           Tap the heart on any lot to save it here. We&apos;ll keep your countdowns running so you
           never miss the close.
         </p>
@@ -38,11 +38,11 @@ export default function WatchlistView() {
 
   return (
     <>
-      <div className="mb-6 flex items-center gap-3 text-sm text-asphalt">
-        <span className="readout font-bold text-ink">{lots.length}</span> saved
+      <div className="mb-6 flex items-center gap-3 text-sm text-muted">
+        <span className="readout font-bold text-fg">{lots.length}</span> saved
         {endingSoon > 0 && (
           <>
-            <span className="h-1 w-1 rounded-full bg-chrome" />
+            <span className="h-1 w-1 rounded-full bg-line" />
             <span>
               <span className="readout font-bold text-redline">{endingSoon}</span> still live
             </span>
@@ -60,7 +60,7 @@ export default function WatchlistView() {
               initial={reduceMotion ? false : { opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: i * 0.04, ease: [0.16, 1, 0.3, 1] }}
-              className="group overflow-hidden rounded-xl border border-chrome/80 bg-paper-raised shadow-lot"
+              className="group overflow-hidden rounded-xl border border-line/80 bg-surface shadow-lot"
             >
               <Link href={`/auctions/details/${lot.id}`} className="block">
                 <div className="relative aspect-[16/10] w-full overflow-hidden bg-ink">
@@ -72,13 +72,13 @@ export default function WatchlistView() {
                   </div>
                 </div>
                 <div className="p-4">
-                  <h3 className="font-display text-lg font-bold leading-tight text-ink">
+                  <h3 className="font-display text-lg font-bold leading-tight text-fg">
                     {lot.make} {lot.model}
                   </h3>
-                  <div className="mt-3 flex items-end justify-between border-t border-chrome/70 pt-3">
+                  <div className="mt-3 flex items-end justify-between border-t border-line/70 pt-3">
                     <div>
                       <span className="eyebrow">Current bid</span>
-                      <p className={`readout text-xl font-bold ${hasBid ? 'text-ink' : 'text-asphalt'}`}>
+                      <p className={`readout text-xl font-bold ${hasBid ? 'text-fg' : 'text-muted'}`}>
                         {hasBid ? `$${numberWithCommas(lot.currentHighBid)}` : 'No bids yet'}
                       </p>
                     </div>
@@ -88,7 +88,7 @@ export default function WatchlistView() {
                         e.preventDefault();
                         remove(lot.id);
                       }}
-                      className="text-xs font-medium text-asphalt transition-colors hover:text-redline"
+                      className="text-xs font-medium text-muted transition-colors hover:text-redline"
                     >
                       Remove
                     </button>

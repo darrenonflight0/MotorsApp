@@ -25,7 +25,7 @@ export default function NavLinks() {
             key={l.href}
             href={l.href}
             className={`group relative rounded-md px-3 py-2.5 text-sm font-medium transition-colors ${
-              active ? 'text-redline' : 'text-ink hover:text-redline'
+              active ? 'text-redline' : 'text-fg hover:text-redline'
             }`}
           >
             {l.label}

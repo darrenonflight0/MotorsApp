@@ -13,7 +13,7 @@ export default function WatchlistBell() {
   return (
     <Link
       href="/watchlist"
-      className="relative grid h-9 w-9 place-items-center rounded-lg text-ink transition-colors hover:text-redline"
+      className="relative grid h-9 w-9 place-items-center rounded-lg text-fg transition-colors hover:text-redline"
       aria-label={`Watchlist${mounted && count ? `, ${count} saved` : ''}`}
       title="Your watchlist"
     >

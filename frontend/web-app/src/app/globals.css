@@ -26,6 +26,28 @@
   --chrome-dark-rgb: 54 60 69;
   --asphalt-rgb: 90 96 105;
   --racing-rgb: 30 125 90;
+
+  /* Semantic role tokens — these are what flips between light and dark. The
+     value tokens above stay fixed, so 'always dark' surfaces (heroes, footer,
+     image mats) read identically in both themes. */
+  --canvas-rgb: var(--paper-rgb);          /* page background */
+  --surface-rgb: var(--paper-raised-rgb);  /* raised panels / cards */
+  --fg-rgb: var(--ink-rgb);                /* primary text */
+  --muted-rgb: var(--asphalt-rgb);         /* secondary text */
+  --line-rgb: var(--chrome-rgb);           /* hairline borders */
+  --canvas-glow: #fffdf8;                  /* radial highlight at top of page */
+}
+
+:root.dark {
+  --canvas-rgb: 16 19 24;
+  --surface-rgb: 24 28 35;
+  --fg-rgb: 233 236 239;
+  --muted-rgb: 152 158 167;
+  --line-rgb: 42 48 56;
+  --canvas-glow: #1a1f27;
+  /* muted base hex is referenced directly in a couple of spots */
+  --asphalt: #989ea7;
+  --chrome: #2a3038;
 }
 
 html {
@@ -33,9 +55,9 @@ html {
 }
 
 body {
-  color: var(--ink);
+  color: rgb(var(--fg-rgb));
   background:
-    radial-gradient(120% 90% at 50% -10%, #fffdf8 0%, var(--paper) 55%) fixed;
+    radial-gradient(120% 90% at 50% -10%, var(--canvas-glow) 0%, rgb(var(--canvas-rgb)) 55%) fixed;
   font-family: var(--font-body), system-ui, sans-serif;
   font-feature-settings: 'ss01';
 }
@@ -51,6 +73,12 @@ body::after {
   opacity: 0.035;
   mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* On dark surfaces the multiply grain vanishes; screen it faintly instead. */
+:root.dark body::after {
+  mix-blend-mode: screen;
+  opacity: 0.02;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -70,7 +98,7 @@ p {
 
 @layer components {
   .dropdown-item {
-    @apply w-full text-left px-4 py-2.5 text-sm text-[color:var(--ink)] hover:bg-[color:var(--paper)] transition-colors;
+    @apply w-full text-left px-4 py-2.5 text-sm text-fg hover:bg-canvas transition-colors;
   }
 
   .input-custom {
@@ -80,7 +108,7 @@ p {
   /* Eyebrow label — small caps utility text (lot labels, section kickers) */
   .eyebrow {
     font-family: var(--font-mono), monospace;
-    @apply text-[11px] uppercase tracking-[0.22em] text-[color:var(--asphalt)];
+    @apply text-[11px] uppercase tracking-[0.22em] text-muted;
   }
 
   /* Instrument readout — mono numerics for prices, mileage, lot numbers */
@@ -106,22 +134,22 @@ p {
 
   /* Quiet secondary action */
   .btn-ghost {
-    @apply inline-flex items-center justify-center rounded-lg border border-chrome-dark/25 px-5 py-2.5 font-display text-sm font-bold uppercase tracking-wide text-ink transition-colors hover:border-ink active:translate-y-px disabled:opacity-50;
+    @apply inline-flex items-center justify-center rounded-lg border border-line px-5 py-2.5 font-display text-sm font-bold uppercase tracking-wide text-fg transition-colors hover:border-fg active:translate-y-px disabled:opacity-50;
   }
 
   /* Raised catalogue surface */
   .panel {
-    @apply rounded-xl border border-chrome/80 bg-paper-raised shadow-lot;
+    @apply rounded-xl border border-line/80 bg-surface shadow-lot;
   }
 
   /* Form field primitives */
   .field-label {
     font-family: var(--font-mono), monospace;
-    @apply mb-1.5 block text-[11px] uppercase tracking-[0.22em] text-asphalt;
+    @apply mb-1.5 block text-[11px] uppercase tracking-[0.22em] text-muted;
   }
 
   .field-input {
-    @apply w-full rounded-lg border border-chrome-dark/25 bg-white px-3 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-asphalt/60 focus:border-redline;
+    @apply w-full rounded-lg border border-line bg-surface px-3 py-2.5 text-sm text-fg outline-none transition-colors placeholder:text-muted/60 focus:border-redline;
   }
 }
 

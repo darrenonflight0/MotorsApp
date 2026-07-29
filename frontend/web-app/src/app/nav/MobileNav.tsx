@@ -31,7 +31,7 @@ export default function MobileNav() {
       <button
         onClick={() => setOpen(true)}
         aria-label="Open menu"
-        className="rounded-lg p-2 text-ink transition-colors hover:text-redline"
+        className="rounded-lg p-2 text-fg transition-colors hover:text-redline"
       >
         <HiMenu className="h-6 w-6" />
       </button>
@@ -51,13 +51,13 @@ export default function MobileNav() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', stiffness: 380, damping: 38 }}
-              className="fixed inset-y-0 right-0 z-[81] flex w-72 max-w-[85vw] flex-col bg-paper-raised shadow-lot-hover"
+              className="fixed inset-y-0 right-0 z-[81] flex w-72 max-w-[85vw] flex-col bg-surface shadow-lot-hover"
             >
-              <div className="flex items-center justify-between border-b border-chrome/70 px-5 py-4">
-                <span className="font-display text-sm font-extrabold uppercase tracking-[0.06em] text-ink">
-                  Yamkela<span className="ml-1 font-semibold text-chrome-dark">Motors</span>
+              <div className="flex items-center justify-between border-b border-line/70 px-5 py-4">
+                <span className="font-display text-sm font-extrabold uppercase tracking-[0.06em] text-fg">
+                  Yamkela<span className="ml-1 font-semibold text-muted">Motors</span>
                 </span>
-                <button onClick={() => setOpen(false)} aria-label="Close menu" className="p-1 text-ink hover:text-redline">
+                <button onClick={() => setOpen(false)} aria-label="Close menu" className="p-1 text-fg hover:text-redline">
                   <HiX className="h-6 w-6" />
                 </button>
               </div>
@@ -75,7 +75,7 @@ export default function MobileNav() {
                       <Link
                         href={l.href}
                         className={`block rounded-lg px-4 py-3 font-display text-base font-semibold transition-colors ${
-                          active ? 'bg-redline/10 text-redline' : 'text-ink hover:bg-paper'
+                          active ? 'bg-redline/10 text-redline' : 'text-fg hover:bg-canvas'
                         }`}
                       >
                         {l.label}
@@ -85,7 +85,7 @@ export default function MobileNav() {
                 })}
               </nav>
 
-              <div className="border-t border-chrome/70 p-3">
+              <div className="border-t border-line/70 p-3">
                 <Link href="/verify" className="btn-primary block w-full text-center">
                   Sell your car
                 </Link>

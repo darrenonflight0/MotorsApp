@@ -33,13 +33,19 @@ export const metadata: Metadata = {
   description: 'Your Bid. Your Drive. Your Way.',
 };
 
+// Set the theme class before first paint to avoid a flash of the wrong theme.
+const themeScript = `(function(){try{var t=localStorage.getItem('yamkela-theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}if(t==='dark'){document.documentElement.classList.add('dark');}}catch(e){}})();`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className={`${archivo.variable} ${publicSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>
           <SplashScreen />

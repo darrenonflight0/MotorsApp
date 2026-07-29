@@ -17,7 +17,7 @@ export default function EmptyFilter({
   const reset = useParamsStore((state) => state.reset);
 
   return (
-    <div className="flex h-[40vh] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-chrome-dark/30 bg-paper-raised/60">
+    <div className="flex h-[40vh] flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-line/30 bg-surface/60">
       <Heading title={title} subtitle={subtitle} center />
       <div className="mt-4">
         {showReset && (

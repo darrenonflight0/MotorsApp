@@ -38,7 +38,7 @@ export default function UserActions({ user }: Props) {
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 rounded-lg px-2 py-1.5 font-display font-semibold text-ink transition-colors hover:text-redline"
+        className="flex items-center gap-2 rounded-lg px-2 py-1.5 font-display font-semibold text-fg transition-colors hover:text-redline"
       >
         <HiUser /> {user.name}
         <VerifiedBadge verified={user.verified} size="sm" />
@@ -51,7 +51,7 @@ export default function UserActions({ user }: Props) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -6, scale: 0.98 }}
             transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute right-0 z-50 mt-3 w-56 rounded-xl border border-chrome/80 bg-paper-raised py-1 text-sm shadow-lot-hover"
+            className="absolute right-0 z-50 mt-3 w-56 rounded-xl border border-line/80 bg-surface py-1 text-sm shadow-lot-hover"
           >
             {isAdmin && (
               <>
@@ -62,7 +62,7 @@ export default function UserActions({ user }: Props) {
                 >
                   <HiCog className="mr-2 inline" /> Admin dashboard
                 </Link>
-                <div className="my-1 border-t border-chrome/70" />
+                <div className="my-1 border-t border-line/70" />
               </>
             )}
             {user.username && (
@@ -92,7 +92,7 @@ export default function UserActions({ user }: Props) {
             <Link href="/session" onClick={() => setOpen(false)} className="dropdown-item block">
               <HiUser className="mr-2 inline" /> Session (dev)
             </Link>
-            <div className="my-1 border-t border-chrome/70" />
+            <div className="my-1 border-t border-line/70" />
             <button
               onClick={() => signOut({ callbackUrl: '/' })}
               className="dropdown-item !text-redline"

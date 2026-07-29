@@ -76,11 +76,11 @@ export default function Listings() {
     return (
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {Array.from({ length: params.pageSize }).map((_, i) => (
-          <div key={i} className="animate-pulse overflow-hidden rounded-xl border border-chrome/60 bg-paper-raised">
-            <div className="aspect-[16/10] w-full bg-chrome/40" />
+          <div key={i} className="animate-pulse overflow-hidden rounded-xl border border-line/60 bg-surface">
+            <div className="aspect-[16/10] w-full bg-line/40" />
             <div className="p-4">
-              <div className="h-4 w-2/3 rounded bg-chrome/50" />
-              <div className="mt-3 h-3 w-1/3 rounded bg-chrome/40" />
+              <div className="h-4 w-2/3 rounded bg-line/50" />
+              <div className="mt-3 h-3 w-1/3 rounded bg-line/40" />
             </div>
           </div>
         ))}
@@ -96,7 +96,7 @@ export default function Listings() {
       ) : (
         <>
           <div className="mb-4 flex items-center justify-between">
-            <span className="readout text-sm text-asphalt">
+            <span className="readout text-sm text-muted">
               {totalCount} {totalCount === 1 ? 'lot' : 'lots'}
             </span>
           </div>

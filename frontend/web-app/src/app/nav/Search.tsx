@@ -21,7 +21,7 @@ export default function Search() {
   }
 
   return (
-    <div className="flex h-11 w-[60%] items-center rounded-full border border-chrome-dark/25 bg-paper-raised shadow-lot transition-colors focus-within:border-redline">
+    <div className="flex h-11 w-[60%] items-center rounded-full border border-line/25 bg-surface shadow-lot transition-colors focus-within:border-redline">
       <input
         onKeyDown={(e) => {
           if (e.key === 'Enter') search();
@@ -30,7 +30,7 @@ export default function Search() {
         onChange={onChange}
         type="text"
         placeholder="Search for cars by make, model or color"
-        className="input-custom flex-grow bg-transparent px-4 text-sm text-ink placeholder:text-asphalt/60"
+        className="input-custom flex-grow bg-transparent px-4 text-sm text-fg placeholder:text-muted/60"
       />
       <button
         onClick={search}

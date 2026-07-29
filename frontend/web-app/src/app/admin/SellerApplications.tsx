@@ -35,7 +35,7 @@ export default function SellerApplications({ initial }: { initial: ReviewApplica
   return (
     <section>
       <span className="eyebrow">Gatekeeping</span>
-      <h2 className="mb-4 mt-1 flex items-center gap-2 font-display text-2xl font-bold tracking-tight text-ink">
+      <h2 className="mb-4 mt-1 flex items-center gap-2 font-display text-2xl font-bold tracking-tight text-fg">
         Seller verifications
         {apps.length > 0 && (
           <span className="rounded-full bg-redline px-2 py-0.5 text-xs font-bold text-paper">{apps.length}</span>
@@ -43,7 +43,7 @@ export default function SellerApplications({ initial }: { initial: ReviewApplica
       </h2>
 
       {apps.length === 0 ? (
-        <p className="rounded-xl border border-chrome/70 bg-paper-raised p-6 text-sm text-asphalt">
+        <p className="rounded-xl border border-line/70 bg-surface p-6 text-sm text-muted">
           No pending applications. 🎉
         </p>
       ) : (
@@ -54,12 +54,12 @@ export default function SellerApplications({ initial }: { initial: ReviewApplica
                 key={app.id}
                 layout
                 exit={{ opacity: 0, scale: 0.96 }}
-                className="rounded-xl border border-chrome/80 bg-paper-raised p-4 shadow-lot"
+                className="rounded-xl border border-line/80 bg-surface p-4 shadow-lot"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-display font-bold text-ink">@{app.username}</p>
-                    <p className="text-xs text-chrome-dark">
+                    <p className="font-display font-bold text-fg">@{app.username}</p>
+                    <p className="text-xs text-muted">
                       {app.idType} · {new Date(app.submittedAt).toLocaleString()}
                     </p>
                   </div>
@@ -68,13 +68,13 @@ export default function SellerApplications({ initial }: { initial: ReviewApplica
                 <div className="mt-3 grid grid-cols-2 gap-3">
                   <figure>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={app.selfieImage} alt="selfie" className="aspect-square w-full rounded-lg border border-chrome/70 object-cover" />
-                    <figcaption className="mt-1 text-center text-xs text-asphalt">Selfie</figcaption>
+                    <img src={app.selfieImage} alt="selfie" className="aspect-square w-full rounded-lg border border-line/70 object-cover" />
+                    <figcaption className="mt-1 text-center text-xs text-muted">Selfie</figcaption>
                   </figure>
                   <figure>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={app.idImage} alt="id document" className="aspect-square w-full rounded-lg border border-chrome/70 object-cover" />
-                    <figcaption className="mt-1 text-center text-xs text-asphalt">{app.idType}</figcaption>
+                    <img src={app.idImage} alt="id document" className="aspect-square w-full rounded-lg border border-line/70 object-cover" />
+                    <figcaption className="mt-1 text-center text-xs text-muted">{app.idType}</figcaption>
                   </figure>
                 </div>
 

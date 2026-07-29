@@ -32,7 +32,7 @@ function segments(totalSeconds: number) {
 }
 
 const DIGIT_COLOR: Record<Urgency, string> = {
-  ended: 'text-asphalt',
+  ended: 'text-muted',
   critical: 'text-redline',
   soon: 'text-paper',
   live: 'text-paper',
@@ -62,7 +62,7 @@ export default function CountdownTimer({ auctionEnd, size = 'sm' }: Props) {
 
   return (
     <div
-      className={`inline-flex items-center gap-2.5 rounded-md border border-chrome-dark/80 bg-ink/95 shadow-lg backdrop-blur-sm ${
+      className={`inline-flex items-center gap-2.5 rounded-md border border-line/80 bg-ink/95 shadow-lg backdrop-blur-sm ${
         big ? 'px-4 py-2.5' : 'px-2.5 py-1.5'
       }`}
     >
@@ -74,18 +74,18 @@ export default function CountdownTimer({ auctionEnd, size = 'sm' }: Props) {
       </span>
 
       {urgency === 'ended' ? (
-        <span className={`eyebrow ${big ? 'text-xs' : ''} !text-asphalt`}>Auction ended</span>
+        <span className={`eyebrow ${big ? 'text-xs' : ''} !text-muted`}>Auction ended</span>
       ) : (
         <div className="flex flex-col">
           <div className={`readout flex items-baseline gap-1 font-semibold ${DIGIT_COLOR[urgency]} ${big ? 'text-xl' : 'text-sm'}`}>
             {segments(secondsLeft).map((seg, i) => (
               <span key={i} className="flex items-baseline">
                 {seg.v}
-                <span className={`ml-0.5 text-[0.6em] font-medium text-asphalt`}>{seg.u}</span>
+                <span className={`ml-0.5 text-[0.6em] font-medium text-muted`}>{seg.u}</span>
               </span>
             ))}
           </div>
-          <span className={`tick-strip mt-1 h-[3px] w-full ${urgency === 'live' ? 'text-chrome-dark' : 'text-redline/70'}`} />
+          <span className={`tick-strip mt-1 h-[3px] w-full ${urgency === 'live' ? 'text-muted' : 'text-redline/70'}`} />
         </div>
       )}
     </div>

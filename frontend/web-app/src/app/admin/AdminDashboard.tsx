@@ -15,7 +15,7 @@ const statusCls: Record<Escrow['status'], string> = {
   AwaitingDeposit: 'bg-amber-500/10 text-amber-700',
   Funded: 'bg-racing/10 text-racing',
   Released: 'bg-racing/10 text-racing',
-  Refunded: 'bg-chrome/60 text-asphalt',
+  Refunded: 'bg-line/60 text-muted',
   Disputed: 'bg-redline/10 text-redline',
 };
 
@@ -67,11 +67,11 @@ export default function AdminDashboard({ initialDisputed, initialAll }: Props) {
       {/* Dispute queue */}
       <section>
         <span className="eyebrow">Needs attention</span>
-        <h2 className="mb-4 mt-1 font-display text-2xl font-bold tracking-tight text-ink">
+        <h2 className="mb-4 mt-1 font-display text-2xl font-bold tracking-tight text-fg">
           Dispute queue
         </h2>
         {disputed.length === 0 ? (
-          <p className="rounded-xl border border-chrome/70 bg-paper-raised p-6 text-sm text-asphalt">
+          <p className="rounded-xl border border-line/70 bg-surface p-6 text-sm text-muted">
             No open disputes. 🎉
           </p>
         ) : (
@@ -79,15 +79,15 @@ export default function AdminDashboard({ initialDisputed, initialAll }: Props) {
             {disputed.map((e) => (
               <div
                 key={e.id}
-                className="flex flex-col gap-4 rounded-xl border border-redline/30 bg-paper-raised p-4 shadow-lot sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-4 rounded-xl border border-redline/30 bg-surface p-4 shadow-lot sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="min-w-0">
-                  <div className="readout text-lg font-bold text-ink">${numberWithCommas(e.amount)}</div>
-                  <div className="mt-0.5 truncate text-sm text-asphalt">
-                    Buyer <span className="font-semibold text-ink">{e.buyer}</span> · Seller{' '}
-                    <span className="font-semibold text-ink">{e.seller}</span>
+                  <div className="readout text-lg font-bold text-fg">${numberWithCommas(e.amount)}</div>
+                  <div className="mt-0.5 truncate text-sm text-muted">
+                    Buyer <span className="font-semibold text-fg">{e.buyer}</span> · Seller{' '}
+                    <span className="font-semibold text-fg">{e.seller}</span>
                   </div>
-                  <div className="mt-0.5 text-xs text-chrome-dark">Auction {e.auctionId}</div>
+                  <div className="mt-0.5 text-xs text-muted">Auction {e.auctionId}</div>
                 </div>
                 <div className="flex shrink-0 gap-2">
                   <button
@@ -100,7 +100,7 @@ export default function AdminDashboard({ initialDisputed, initialAll }: Props) {
                   <button
                     disabled={busy === e.auctionId}
                     onClick={() => resolve(e.auctionId, 'refund')}
-                    className="rounded-lg border border-chrome-dark/40 px-4 py-2 font-display text-sm font-bold uppercase tracking-wide text-ink transition-colors hover:bg-ink hover:text-paper disabled:opacity-50"
+                    className="rounded-lg border border-line/40 px-4 py-2 font-display text-sm font-bold uppercase tracking-wide text-fg transition-colors hover:bg-ink hover:text-paper disabled:opacity-50"
                   >
                     Refund buyer
                   </button>
@@ -114,12 +114,12 @@ export default function AdminDashboard({ initialDisputed, initialAll }: Props) {
       {/* All escrows */}
       <section>
         <span className="eyebrow">Oversight</span>
-        <h2 className="mb-4 mt-1 font-display text-2xl font-bold tracking-tight text-ink">
+        <h2 className="mb-4 mt-1 font-display text-2xl font-bold tracking-tight text-fg">
           All escrows
         </h2>
-        <div className="overflow-x-auto rounded-xl border border-chrome/70">
+        <div className="overflow-x-auto rounded-xl border border-line/70">
           <table className="w-full min-w-[640px] text-left text-sm">
-            <thead className="bg-paper-raised text-xs uppercase tracking-wide text-chrome-dark">
+            <thead className="bg-surface text-xs uppercase tracking-wide text-muted">
               <tr>
                 <th className="p-3">Auction</th>
                 <th className="p-3">Buyer</th>
@@ -132,18 +132,18 @@ export default function AdminDashboard({ initialDisputed, initialAll }: Props) {
             <tbody className="divide-y divide-chrome/60">
               {all.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="p-6 text-center text-asphalt">
+                  <td colSpan={6} className="p-6 text-center text-muted">
                     No escrows yet.
                   </td>
                 </tr>
               ) : (
                 all.map((e) => (
-                  <tr key={e.id} className="bg-paper">
-                    <td className="max-w-[160px] truncate p-3 font-mono text-xs text-asphalt">{e.auctionId}</td>
+                  <tr key={e.id} className="bg-canvas">
+                    <td className="max-w-[160px] truncate p-3 font-mono text-xs text-muted">{e.auctionId}</td>
                     <td className="p-3">{e.buyer}</td>
                     <td className="p-3">{e.seller}</td>
                     <td className="readout p-3 text-right">${numberWithCommas(e.amount)}</td>
-                    <td className="p-3 text-asphalt">{e.paymentProvider ?? '—'}</td>
+                    <td className="p-3 text-muted">{e.paymentProvider ?? '—'}</td>
                     <td className="p-3">
                       <span className={`eyebrow rounded-full px-2 py-0.5 ${statusCls[e.status]}`}>
                         {e.status}
@@ -164,10 +164,10 @@ function Stat({ label, value, accent }: { label: string; value: string; accent?:
   return (
     <div
       className={`rounded-xl border p-5 shadow-lot ${
-        accent ? 'border-redline/40 bg-redline/5' : 'border-chrome/80 bg-paper-raised'
+        accent ? 'border-redline/40 bg-redline/5' : 'border-line/80 bg-surface'
       }`}
     >
-      <div className={`readout text-3xl font-bold ${accent ? 'text-redline' : 'text-ink'}`}>{value}</div>
+      <div className={`readout text-3xl font-bold ${accent ? 'text-redline' : 'text-fg'}`}>{value}</div>
       <div className="eyebrow mt-1">{label}</div>
     </div>
   );

@@ -27,10 +27,10 @@ export default function AuctionCard({ auction, sellerVerified }: Props) {
   return (
     <Link
       href={`/auctions/details/${auction.id}`}
-      className="group block overflow-hidden rounded-xl border border-chrome/80 bg-paper-raised shadow-lot transition-all duration-300 hover:-translate-y-1 hover:border-chrome-dark/40 hover:shadow-lot-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-redline"
+      className="group block overflow-hidden rounded-xl border border-line/80 bg-surface shadow-lot transition-all duration-300 hover:-translate-y-1 hover:border-line/40 hover:shadow-lot-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-redline"
     >
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-ink">
-        <span className="eyebrow absolute left-3 top-3 z-20 rounded bg-paper-raised/90 px-2 py-1 !text-ink shadow-sm">
+        <span className="eyebrow absolute left-3 top-3 z-20 rounded bg-surface/90 px-2 py-1 !text-fg shadow-sm">
           Lot {lot}
         </span>
         <WatchButton auction={auction} />
@@ -75,21 +75,21 @@ export default function AuctionCard({ auction, sellerVerified }: Props) {
 
       <div className="p-4">
         <div className="flex items-start justify-between gap-3">
-          <h3 className="flex items-center gap-1 font-display text-lg font-bold leading-tight text-ink transition-colors group-hover:text-redline">
+          <h3 className="flex items-center gap-1 font-display text-lg font-bold leading-tight text-fg transition-colors group-hover:text-redline">
             {auction.make} {auction.model}
             <VerifiedBadge verified={sellerVerified} size="sm" />
           </h3>
-          <span className="readout mt-0.5 shrink-0 text-sm text-asphalt">{auction.year}</span>
+          <span className="readout mt-0.5 shrink-0 text-sm text-muted">{auction.year}</span>
         </div>
-        <span className="mt-1 flex items-center gap-1.5 text-xs text-asphalt">
+        <span className="mt-1 flex items-center gap-1.5 text-xs text-muted">
           <span className="truncate">@{auction.seller}</span>
           <VerifiedBadge verified={sellerVerified} variant="badge" />
         </span>
 
-        <div className="mt-3 flex items-end justify-between border-t border-chrome/70 pt-3">
+        <div className="mt-3 flex items-end justify-between border-t border-line/70 pt-3">
           <div>
             <span className="eyebrow">Current bid</span>
-            <p className={`readout text-xl font-bold ${hasBid ? 'text-ink' : 'text-asphalt'}`}>
+            <p className={`readout text-xl font-bold ${hasBid ? 'text-fg' : 'text-muted'}`}>
               {hasBid ? `$${numberWithCommas(auction.currentHighBid)}` : 'No bids yet'}
             </p>
           </div>

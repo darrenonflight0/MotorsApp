@@ -26,7 +26,7 @@ export default function NotificationBell() {
     <div className="relative">
       <button
         onClick={toggle}
-        className="relative p-1 text-ink transition-colors hover:text-redline"
+        className="relative p-1 text-fg transition-colors hover:text-redline"
         aria-label="notifications"
       >
         <HiBell size={22} />
@@ -44,10 +44,10 @@ export default function NotificationBell() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -6, scale: 0.98 }}
             transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute right-0 z-50 mt-3 max-h-96 w-80 overflow-y-auto rounded-xl border border-chrome/80 bg-paper-raised shadow-lot-hover"
+            className="absolute right-0 z-50 mt-3 max-h-96 w-80 overflow-y-auto rounded-xl border border-line/80 bg-surface shadow-lot-hover"
           >
-            <div className="flex items-center justify-between border-b border-chrome/70 px-4 py-3">
-              <span className="eyebrow !text-ink">Notifications</span>
+            <div className="flex items-center justify-between border-b border-line/70 px-4 py-3">
+              <span className="eyebrow !text-fg">Notifications</span>
               {notifications.length > 0 && (
                 <button
                   onClick={clear}
@@ -58,15 +58,15 @@ export default function NotificationBell() {
               )}
             </div>
             {notifications.length === 0 ? (
-              <div className="px-4 py-8 text-center text-sm text-asphalt">
+              <div className="px-4 py-8 text-center text-sm text-muted">
                 Nothing yet. New bids and lots will land here.
               </div>
             ) : (
               notifications.map((n) => {
                 const inner = (
-                  <div className="border-b border-chrome/60 px-4 py-3 text-sm transition-colors last:border-0 hover:bg-paper">
-                    <div className="font-display font-semibold text-ink">{n.type}</div>
-                    <div className="mt-0.5 text-asphalt">{n.message}</div>
+                  <div className="border-b border-line/60 px-4 py-3 text-sm transition-colors last:border-0 hover:bg-canvas">
+                    <div className="font-display font-semibold text-fg">{n.type}</div>
+                    <div className="mt-0.5 text-muted">{n.message}</div>
                   </div>
                 );
                 return n.href ? (

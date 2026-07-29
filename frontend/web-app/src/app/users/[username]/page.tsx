@@ -37,7 +37,7 @@ export default async function UserPage({ params }: Props) {
       <section className="mb-10 overflow-hidden rounded-2xl bg-ink px-6 py-10 text-paper sm:px-10">
         <span className="eyebrow !text-chrome">Seller showroom</span>
         <div className="mt-3 flex items-center gap-4">
-          <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full border-2 border-chrome/40 bg-ink-soft">
+          <div className="h-16 w-16 shrink-0 overflow-hidden rounded-full border-2 border-line/40 bg-ink-soft">
             {profile?.profilePicture ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={profile.profilePicture} alt={username} className="h-full w-full object-cover" />
@@ -71,11 +71,11 @@ export default async function UserPage({ params }: Props) {
       </section>
 
       <section>
-        <h2 className="mb-4 font-display text-2xl font-bold tracking-tight text-ink">
+        <h2 className="mb-4 font-display text-2xl font-bold tracking-tight text-fg">
           Lots by {username}
         </h2>
         {selling.results.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-chrome-dark/30 bg-paper-raised/60 p-10 text-center text-asphalt">
+          <div className="rounded-xl border border-dashed border-line/30 bg-surface/60 p-10 text-center text-muted">
             No lots listed yet.
           </div>
         ) : (
@@ -89,7 +89,7 @@ export default async function UserPage({ params }: Props) {
 
       {won.results.length > 0 && (
         <section className="mt-12">
-          <h2 className="mb-4 font-display text-2xl font-bold tracking-tight text-ink">
+          <h2 className="mb-4 font-display text-2xl font-bold tracking-tight text-fg">
             Auctions won
           </h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

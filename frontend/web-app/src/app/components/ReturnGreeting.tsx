@@ -46,11 +46,11 @@ export default function ReturnGreeting({ name }: Props) {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-        className="mb-6 flex items-center justify-between gap-4 rounded-xl border border-chrome/80 bg-paper-raised px-5 py-3.5 shadow-lot"
+        className="mb-6 flex items-center justify-between gap-4 rounded-xl border border-line/80 bg-surface px-5 py-3.5 shadow-lot"
       >
-        <p className="text-sm text-ink">
+        <p className="text-sm text-fg">
           <span className="font-display font-bold">{greeting}</span>{' '}
-          <span className="text-asphalt">{detail}</span>
+          <span className="text-muted">{detail}</span>
         </p>
         <div className="flex shrink-0 items-center gap-3">
           {lots.length > 0 && (
@@ -64,7 +64,7 @@ export default function ReturnGreeting({ name }: Props) {
           <button
             onClick={() => setDismissed(true)}
             aria-label="Dismiss"
-            className="text-asphalt transition-colors hover:text-ink"
+            className="text-muted transition-colors hover:text-fg"
           >
             ✕
           </button>

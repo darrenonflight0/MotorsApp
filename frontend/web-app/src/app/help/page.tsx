@@ -41,10 +41,10 @@ export default function HelpPage() {
         {channels.map((c) => (
           <div
             key={c.title}
-            className="flex flex-col rounded-xl border border-chrome/80 bg-paper-raised p-6 shadow-lot"
+            className="flex flex-col rounded-xl border border-line/80 bg-surface p-6 shadow-lot"
           >
-            <h3 className="font-display font-bold text-ink">{c.title}</h3>
-            <p className="mt-2 flex-1 text-sm leading-relaxed text-asphalt">{c.body}</p>
+            <h3 className="font-display font-bold text-fg">{c.title}</h3>
+            <p className="mt-2 flex-1 text-sm leading-relaxed text-muted">{c.body}</p>
             <Link
               href={c.href}
               className="mt-4 text-sm font-semibold text-redline transition-colors hover:text-redline-deep"
@@ -57,7 +57,7 @@ export default function HelpPage() {
 
       <section className="mb-12">
         <span className="eyebrow">FAQ</span>
-        <h2 className="mt-1 mb-5 font-display text-2xl font-bold tracking-tight text-ink">
+        <h2 className="mt-1 mb-5 font-display text-2xl font-bold tracking-tight text-fg">
           Frequently asked
         </h2>
         <Faq />

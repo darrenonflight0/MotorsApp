@@ -11,7 +11,7 @@ export default function Gallery({ images, alt }: { images: string[]; alt: string
 
   return (
     <div>
-      <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-chrome/80 bg-ink shadow-lot">
+      <div className="relative aspect-video w-full overflow-hidden rounded-xl border border-line/80 bg-ink shadow-lot">
         <AnimatePresence mode="wait">
           <motion.img
             key={active}
@@ -34,7 +34,7 @@ export default function Gallery({ images, alt }: { images: string[]; alt: string
               onClick={() => setActive(i)}
               aria-label={`View photo ${i + 1}`}
               className={`relative h-16 w-20 shrink-0 overflow-hidden rounded-lg border-2 transition-all ${
-                i === active ? 'border-redline' : 'border-chrome/60 opacity-70 hover:opacity-100'
+                i === active ? 'border-redline' : 'border-line/60 opacity-70 hover:opacity-100'
               }`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}

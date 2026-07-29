@@ -35,7 +35,7 @@ export default function ShippingCalculator() {
   }, [dest, method, insure]);
 
   return (
-    <div className="rounded-xl border border-chrome/80 bg-paper-raised p-6 shadow-lot">
+    <div className="rounded-xl border border-line/80 bg-surface p-6 shadow-lot">
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label className="field-label">Destination port</label>
@@ -67,7 +67,7 @@ export default function ShippingCalculator() {
         </div>
       </div>
 
-      <label className="mt-4 flex items-center gap-2.5 text-sm text-ink">
+      <label className="mt-4 flex items-center gap-2.5 text-sm text-fg">
         <input
           type="checkbox"
           checked={insure}
@@ -77,19 +77,19 @@ export default function ShippingCalculator() {
         Add marine insurance (1.5% of freight)
       </label>
 
-      <div className="mt-5 space-y-2 border-t border-chrome/70 pt-4 text-sm">
+      <div className="mt-5 space-y-2 border-t border-line/70 pt-4 text-sm">
         <Row label="Ocean freight" value={quote.freight} />
         {quote.insurance > 0 && <Row label="Marine insurance" value={quote.insurance} />}
         <Row label="Documentation" value={quote.docs} />
-        <div className="flex items-center justify-between border-t border-chrome/70 pt-3">
-          <span className="font-display font-bold text-ink">Estimated total</span>
+        <div className="flex items-center justify-between border-t border-line/70 pt-3">
+          <span className="font-display font-bold text-fg">Estimated total</span>
           <span className="readout text-2xl font-bold text-redline">
             ${numberWithCommas(quote.total)}
           </span>
         </div>
       </div>
 
-      <p className="mt-4 text-xs leading-relaxed text-asphalt">
+      <p className="mt-4 text-xs leading-relaxed text-muted">
         Estimates are indicative and exclude destination duties and local port charges.
         A binding quote is issued after your vehicle is won and inspected.
       </p>
@@ -99,9 +99,9 @@ export default function ShippingCalculator() {
 
 function Row({ label, value }: { label: string; value: number }) {
   return (
-    <div className="flex items-center justify-between text-asphalt">
+    <div className="flex items-center justify-between text-muted">
       <span>{label}</span>
-      <span className="readout text-ink">${numberWithCommas(value)}</span>
+      <span className="readout text-fg">${numberWithCommas(value)}</span>
     </div>
   );
 }

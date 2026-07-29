@@ -89,7 +89,7 @@ export default function PaystackDepositButton({ auctionId, amount, email, onFund
         <button disabled={busy} onClick={pay} className="btn-primary disabled:opacity-50">
           {busy ? 'Confirming…' : `Pay ${CURRENCY} ${amount.toLocaleString()} with Paystack`}
         </button>
-        <span className="text-xs text-asphalt">
+        <span className="text-xs text-muted">
           Secured by Paystack · {ready ? 'card, bank & mobile money' : 'loading secure checkout…'}
         </span>
       </div>

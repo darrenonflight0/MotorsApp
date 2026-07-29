@@ -35,7 +35,7 @@ const groups = [
 
 export default function Footer() {
   return (
-    <footer className="mt-20 border-t border-chrome/70 bg-ink text-paper">
+    <footer className="mt-20 border-t border-line/70 bg-ink text-paper">
       <div className="mx-auto grid max-w-[1400px] gap-10 px-5 py-12 sm:px-8 md:grid-cols-[1.5fr_1fr_1fr_1fr_1fr]">
         <div>
           <span className="font-display text-lg font-extrabold uppercase tracking-[0.06em]">
@@ -60,7 +60,7 @@ export default function Footer() {
           </div>
         ))}
       </div>
-      <div className="border-t border-chrome-dark/60">
+      <div className="border-t border-line/60">
         <div className="mx-auto flex max-w-[1400px] flex-col gap-2 px-5 py-5 text-xs text-chrome sm:flex-row sm:items-center sm:justify-between sm:px-8">
           <span>© {new Date().getFullYear()} Yamkela Motors. Your Bid. Your Drive. Your Way.</span>
           <span className="flex items-center gap-4">

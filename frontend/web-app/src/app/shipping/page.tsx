@@ -66,10 +66,10 @@ export default function ShippingPage() {
       <section className="mb-12 grid gap-8 lg:grid-cols-[1.3fr_1fr]">
         <div>
           <span className="eyebrow">Overview</span>
-          <h2 className="mt-1 font-display text-2xl font-bold tracking-tight text-ink">
+          <h2 className="mt-1 font-display text-2xl font-bold tracking-tight text-fg">
             One team, door to port
           </h2>
-          <p className="mt-3 max-w-xl leading-relaxed text-asphalt">
+          <p className="mt-3 max-w-xl leading-relaxed text-muted">
             Once you win a vehicle and fund escrow, our logistics desk books the whole
             journey for you. You get a single reference number, a binding quote after
             inspection, and status updates at each handover: yard, port, vessel and arrival.
@@ -87,14 +87,14 @@ export default function ShippingPage() {
 
       <section className="mb-12">
         <span className="eyebrow">Shipping services</span>
-        <h2 className="mt-1 mb-5 font-display text-2xl font-bold tracking-tight text-ink">
+        <h2 className="mt-1 mb-5 font-display text-2xl font-bold tracking-tight text-fg">
           Choose how it travels
         </h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           {services.map((s) => (
             <article
               key={s.name}
-              className="overflow-hidden rounded-xl border border-chrome/80 bg-paper-raised shadow-lot"
+              className="overflow-hidden rounded-xl border border-line/80 bg-surface shadow-lot"
             >
               <div className="relative aspect-[16/9] w-full overflow-hidden bg-ink">
                 <FallbackImage
@@ -104,8 +104,8 @@ export default function ShippingPage() {
                 />
               </div>
               <div className="p-5">
-                <h3 className="font-display text-lg font-bold text-ink">{s.name}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-asphalt">{s.body}</p>
+                <h3 className="font-display text-lg font-bold text-fg">{s.name}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted">{s.body}</p>
               </div>
             </article>
           ))}
@@ -114,20 +114,20 @@ export default function ShippingPage() {
 
       <section className="mb-4">
         <span className="eyebrow">Transportation &amp; receiving</span>
-        <h2 className="mt-1 mb-5 font-display text-2xl font-bold tracking-tight text-ink">
+        <h2 className="mt-1 mb-5 font-display text-2xl font-bold tracking-tight text-fg">
           Your car&apos;s journey
         </h2>
         <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {journey.map((j, i) => (
             <li
               key={j.step}
-              className="rounded-xl border border-chrome/80 bg-paper-raised p-5 shadow-lot"
+              className="rounded-xl border border-line/80 bg-surface p-5 shadow-lot"
             >
               <span className="readout text-3xl font-bold text-redline">
                 {String(i + 1).padStart(2, '0')}
               </span>
-              <h3 className="mt-2 font-display font-bold text-ink">{j.step}</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-asphalt">{j.body}</p>
+              <h3 className="mt-2 font-display font-bold text-fg">{j.step}</h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-muted">{j.body}</p>
             </li>
           ))}
         </ol>

@@ -84,14 +84,14 @@ export default function HowToBuyPage() {
 
       <section className="mb-12">
         <span className="eyebrow">The process</span>
-        <h2 className="mt-1 mb-5 font-display text-2xl font-bold tracking-tight text-ink">
+        <h2 className="mt-1 mb-5 font-display text-2xl font-bold tracking-tight text-fg">
           Six steps, fully protected
         </h2>
         <ol className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {steps.map((s, i) => (
             <li
               key={s.title}
-              className="overflow-hidden rounded-xl border border-chrome/80 bg-paper-raised shadow-lot"
+              className="overflow-hidden rounded-xl border border-line/80 bg-surface shadow-lot"
             >
               <figure className="relative aspect-[16/9] w-full overflow-hidden bg-ink">
                 <FallbackImage
@@ -107,17 +107,17 @@ export default function HowToBuyPage() {
                 </figcaption>
               </figure>
               <div className="p-5">
-                <h3 className="font-display font-bold text-ink">{s.title}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-asphalt">{s.body}</p>
+                <h3 className="font-display font-bold text-fg">{s.title}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted">{s.body}</p>
               </div>
             </li>
           ))}
         </ol>
       </section>
 
-      <section className="mb-12 rounded-2xl border border-chrome/80 bg-paper-raised p-6 shadow-lot sm:p-8">
+      <section className="mb-12 rounded-2xl border border-line/80 bg-surface p-6 shadow-lot sm:p-8">
         <span className="eyebrow">Safety advice</span>
-        <h2 className="mt-1 mb-4 font-display text-2xl font-bold tracking-tight text-ink">
+        <h2 className="mt-1 mb-4 font-display text-2xl font-bold tracking-tight text-fg">
           Stay protected
         </h2>
         <ul className="grid gap-3 sm:grid-cols-2">
@@ -127,7 +127,7 @@ export default function HowToBuyPage() {
             'Ignore anyone offering an "off-platform" discount. It is the classic fraud pattern.',
             'Check the signed bid history on each lot. A verified chain means the price is genuine.',
           ].map((tip) => (
-            <li key={tip} className="flex gap-2.5 text-sm text-asphalt">
+            <li key={tip} className="flex gap-2.5 text-sm text-muted">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-racing" />
               {tip}
             </li>
@@ -137,7 +137,7 @@ export default function HowToBuyPage() {
 
       <section className="mb-4">
         <span className="eyebrow">Membership levels</span>
-        <h2 className="mt-1 mb-5 font-display text-2xl font-bold tracking-tight text-ink">
+        <h2 className="mt-1 mb-5 font-display text-2xl font-bold tracking-tight text-fg">
           Pick your level
         </h2>
         <div className="grid gap-6 md:grid-cols-3">
@@ -145,7 +145,7 @@ export default function HowToBuyPage() {
             <div
               key={m.tier}
               className={`rounded-xl border p-6 shadow-lot ${
-                m.featured ? 'border-redline bg-paper-raised' : 'border-chrome/80 bg-paper-raised'
+                m.featured ? 'border-redline bg-surface' : 'border-line/80 bg-surface'
               }`}
             >
               {m.featured && (
@@ -153,11 +153,11 @@ export default function HowToBuyPage() {
                   Most popular
                 </span>
               )}
-              <h3 className="mt-3 font-display text-xl font-bold text-ink">{m.tier}</h3>
-              <p className="readout mt-1 text-sm text-asphalt">{m.price}</p>
+              <h3 className="mt-3 font-display text-xl font-bold text-fg">{m.tier}</h3>
+              <p className="readout mt-1 text-sm text-muted">{m.price}</p>
               <ul className="mt-4 space-y-2">
                 {m.perks.map((p) => (
-                  <li key={p} className="flex gap-2 text-sm text-asphalt">
+                  <li key={p} className="flex gap-2 text-sm text-muted">
                     <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-racing" />
                     {p}
                   </li>

@@ -19,7 +19,7 @@ export default function AppPagination({ currentPage, pageCount, pageChanged }: P
       <button
         disabled={currentPage === 1}
         onClick={() => pageChanged(currentPage - 1)}
-        className={`${base} border-chrome/80 bg-paper-raised font-medium text-ink hover:border-chrome-dark/40 hover:text-redline disabled:pointer-events-none disabled:opacity-40`}
+        className={`${base} border-line/80 bg-surface font-medium text-fg hover:border-line/40 hover:text-redline disabled:pointer-events-none disabled:opacity-40`}
       >
         Prev
       </button>
@@ -31,7 +31,7 @@ export default function AppPagination({ currentPage, pageCount, pageChanged }: P
           className={`${base} readout font-semibold ${
             currentPage === page
               ? 'border-ink bg-ink text-paper'
-              : 'border-chrome/80 bg-paper-raised text-ink hover:border-chrome-dark/40 hover:text-redline'
+              : 'border-line/80 bg-surface text-fg hover:border-line/40 hover:text-redline'
           }`}
         >
           {page}
@@ -40,7 +40,7 @@ export default function AppPagination({ currentPage, pageCount, pageChanged }: P
       <button
         disabled={currentPage === pageCount}
         onClick={() => pageChanged(currentPage + 1)}
-        className={`${base} border-chrome/80 bg-paper-raised font-medium text-ink hover:border-chrome-dark/40 hover:text-redline disabled:pointer-events-none disabled:opacity-40`}
+        className={`${base} border-line/80 bg-surface font-medium text-fg hover:border-line/40 hover:text-redline disabled:pointer-events-none disabled:opacity-40`}
       >
         Next
       </button>

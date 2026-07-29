@@ -23,16 +23,16 @@ export default function BidItem({ bid }: Props) {
   const status = statusStyle(bid.bidStatus);
 
   return (
-    <div className="flex items-center justify-between border-b border-chrome/60 px-4 py-3 last:border-0">
+    <div className="flex items-center justify-between border-b border-line/60 px-4 py-3 last:border-0">
       <div className="flex flex-col">
-        <span className="font-display font-semibold text-ink">{bid.bidder}</span>
-        <span className="readout mt-0.5 text-xs text-asphalt">
+        <span className="font-display font-semibold text-fg">{bid.bidder}</span>
+        <span className="readout mt-0.5 text-xs text-muted">
           {format(new Date(bid.bidTime), 'dd MMM yyyy h:mm a')}
         </span>
       </div>
       <div className="flex items-center gap-3">
         <span className={`eyebrow rounded-full px-2.5 py-1 ${status.cls}`}>{status.text}</span>
-        <span className="readout font-bold text-ink">${numberWithCommas(bid.amount)}</span>
+        <span className="readout font-bold text-fg">${numberWithCommas(bid.amount)}</span>
       </div>
     </div>
   );

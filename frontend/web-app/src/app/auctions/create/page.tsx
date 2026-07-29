@@ -11,10 +11,10 @@ export default async function Create() {
   if (!user?.verified) {
     return (
       <div className="mx-auto max-w-md px-1 py-8">
-        <div className="rounded-2xl border border-chrome/80 bg-paper-raised p-8 text-center shadow-lot">
+        <div className="rounded-2xl border border-line/80 bg-surface p-8 text-center shadow-lot">
           <HiBadgeCheck className="mx-auto h-14 w-14 text-sky-500/40" />
-          <h1 className="mt-3 font-display text-2xl font-bold text-ink">Get verified to sell</h1>
-          <p className="mt-2 text-sm leading-relaxed text-asphalt">
+          <h1 className="mt-3 font-display text-2xl font-bold text-fg">Get verified to sell</h1>
+          <p className="mt-2 text-sm leading-relaxed text-muted">
             {user
               ? 'Only verified auctioneers can list cars. Complete a quick identity check to earn your blue tick.'
               : 'Sign in and complete identity verification to list your car for auction.'}
@@ -28,7 +28,7 @@ export default async function Create() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl rounded-xl border border-chrome/80 bg-paper-raised p-6 shadow-lot sm:p-8">
+    <div className="mx-auto max-w-2xl rounded-xl border border-line/80 bg-surface p-6 shadow-lot sm:p-8">
       <Heading title="Sell your car" subtitle="Please enter the details of your car below" />
       <div className="mt-6">
         <AuctionForm />
