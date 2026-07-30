@@ -6,18 +6,28 @@ import { usePathname } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { HiMenu, HiX } from 'react-icons/hi';
+import ThemeToggle from './ThemeToggle';
+import WatchlistBell from './WatchlistBell';
+import NotificationBell from './NotificationBell';
+import UserActions from './UserActions';
 
 const links = [
   { href: '/', label: 'Auctions' },
   { href: '/countries', label: 'Shop by country' },
-  { href: '/watchlist', label: 'Watchlist' },
   { href: '/how-to-buy', label: 'How to buy' },
   { href: '/shipping', label: 'Shipping' },
   { href: '/about', label: 'About' },
   { href: '/help', label: 'Help' },
 ];
 
-export default function MobileNav({ user }: { user?: { name?: string | null } | null }) {
+type NavUser = {
+  username?: string | null;
+  name?: string | null;
+  role?: string | string[];
+  verified?: boolean;
+};
+
+export default function MobileNav({ user }: { user?: NavUser | null }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -64,6 +74,25 @@ export default function MobileNav({ user }: { user?: { name?: string | null } | 
                 </button>
               </div>
 
+              {/* Every control from the desktop bar, kept here on phones */}
+              <div className="flex items-center gap-1 border-b border-line/70 px-3 py-3">
+                <ThemeToggle />
+                <WatchlistBell />
+                <NotificationBell />
+                <div className="ml-auto">
+                  {user ? (
+                    <UserActions user={user} />
+                  ) : (
+                    <button
+                      onClick={() => signIn('id-server', { callbackUrl: '/' }, { prompt: 'login' })}
+                      className="rounded-lg bg-redline px-4 py-2 font-display text-xs font-bold uppercase tracking-wide text-paper transition-colors hover:bg-redline-deep"
+                    >
+                      Login
+                    </button>
+                  )}
+                </div>
+              </div>
+
               <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
                 {links.map((l, i) => {
                   const active = l.href === '/' ? pathname === '/' : pathname.startsWith(l.href);
@@ -87,15 +116,7 @@ export default function MobileNav({ user }: { user?: { name?: string | null } | 
                 })}
               </nav>
 
-              <div className="space-y-2 border-t border-line/70 p-3">
-                {!user && (
-                  <button
-                    onClick={() => signIn('id-server', { callbackUrl: '/' }, { prompt: 'login' })}
-                    className="btn-ghost block w-full text-center"
-                  >
-                    Sign in
-                  </button>
-                )}
+              <div className="border-t border-line/70 p-3">
                 <Link href="/verify" className="btn-primary block w-full text-center">
                   Sell your car
                 </Link>

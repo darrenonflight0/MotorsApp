@@ -44,7 +44,7 @@ export default function NotificationBell() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -6, scale: 0.98 }}
             transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute right-0 z-50 mt-3 max-h-96 w-80 overflow-y-auto rounded-xl border border-line/80 bg-surface shadow-lot-hover"
+            className="absolute right-0 z-50 mt-3 max-h-96 w-[min(20rem,calc(100vw-2.5rem))] overflow-y-auto rounded-xl border border-line/80 bg-surface shadow-lot-hover"
           >
             <div className="flex items-center justify-between border-b border-line/70 px-4 py-3">
               <span className="eyebrow !text-fg">Notifications</span>
