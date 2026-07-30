@@ -40,7 +40,7 @@ export default function UserActions({ user }: Props) {
         onClick={() => setOpen(!open)}
         className="flex items-center gap-2 rounded-lg px-2 py-1.5 font-display font-semibold text-fg transition-colors hover:text-redline"
       >
-        <HiUser /> {user.name}
+        <HiUser /> <span className="hidden max-w-[10ch] truncate sm:inline">{user.name}</span>
         <VerifiedBadge verified={user.verified} size="sm" />
       </button>
 

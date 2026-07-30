@@ -21,12 +21,21 @@ export default async function Navbar() {
         <div className="hidden flex-1 justify-center md:flex">
           <Search />
         </div>
-        <div className="ml-auto flex items-center gap-3 md:ml-0">
+        <div className="ml-auto flex items-center gap-1 sm:gap-3 md:ml-0">
           <ThemeToggle />
-          <WatchlistBell />
-          <NotificationBell />
-          {user ? <UserActions user={user} /> : <LoginButton />}
-          <MobileNav />
+          {/* Bells are desktop/tablet only — on phones they live in the drawer to avoid a cramped bar */}
+          <div className="hidden items-center gap-3 sm:flex">
+            <WatchlistBell />
+            <NotificationBell />
+          </div>
+          {user ? (
+            <UserActions user={user} />
+          ) : (
+            <span className="hidden sm:block">
+              <LoginButton />
+            </span>
+          )}
+          <MobileNav user={user} />
         </div>
       </div>
       <div className="mx-auto hidden max-w-[1400px] items-center border-t border-line/50 px-5 sm:px-8 lg:flex">

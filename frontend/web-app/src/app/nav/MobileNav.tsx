@@ -3,19 +3,21 @@
 import { AnimatePresence, motion } from 'motion/react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { HiMenu, HiX } from 'react-icons/hi';
 
 const links = [
   { href: '/', label: 'Auctions' },
   { href: '/countries', label: 'Shop by country' },
+  { href: '/watchlist', label: 'Watchlist' },
   { href: '/how-to-buy', label: 'How to buy' },
   { href: '/shipping', label: 'Shipping' },
   { href: '/about', label: 'About' },
   { href: '/help', label: 'Help' },
 ];
 
-export default function MobileNav() {
+export default function MobileNav({ user }: { user?: { name?: string | null } | null }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -85,7 +87,15 @@ export default function MobileNav() {
                 })}
               </nav>
 
-              <div className="border-t border-line/70 p-3">
+              <div className="space-y-2 border-t border-line/70 p-3">
+                {!user && (
+                  <button
+                    onClick={() => signIn('id-server', { callbackUrl: '/' }, { prompt: 'login' })}
+                    className="btn-ghost block w-full text-center"
+                  >
+                    Sign in
+                  </button>
+                )}
                 <Link href="/verify" className="btn-primary block w-full text-center">
                   Sell your car
                 </Link>
