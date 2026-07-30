@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { HiMenu, HiX } from 'react-icons/hi';
+import { HiChevronRight, HiMenu, HiX } from 'react-icons/hi';
 import ThemeToggle from './ThemeToggle';
 import WatchlistBell from './WatchlistBell';
 import NotificationBell from './NotificationBell';
@@ -103,11 +103,14 @@ export default function MobileNav({ user }: { user?: NavUser | null }) {
                   >
                     <Link
                       href={l.href}
-                      className={`block rounded-lg px-4 py-3 font-display text-base font-semibold transition-colors ${
-                        active ? 'bg-redline/10 text-redline' : 'text-fg hover:bg-canvas'
+                      className={`flex items-center justify-between rounded-lg border px-4 py-3 font-display text-base font-semibold transition-colors ${
+                        active
+                          ? 'border-redline/40 bg-redline/10 text-redline'
+                          : 'border-line/60 bg-canvas text-fg active:border-redline/40 active:bg-redline/5 active:text-redline'
                       }`}
                     >
                       {l.label}
+                      <HiChevronRight className="h-4 w-4 opacity-40" />
                     </Link>
                   </motion.div>
                 );
