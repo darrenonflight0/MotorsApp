@@ -135,6 +135,18 @@ if (!string.IsNullOrEmpty(googleClientId) && !string.IsNullOrEmpty(googleClientS
 
 var app = builder.Build();
 
+// Behind Railway/Render TLS-terminating proxies the request arrives as HTTP with
+// an X-Forwarded-Proto: https header. Honour it so IdentityServer emits https://
+// discovery/authorize/token URLs instead of http:// (which OIDC clients reject).
+var fwd = new ForwardedHeadersOptions
+{
+    ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor
+        | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto
+};
+fwd.KnownNetworks.Clear();
+fwd.KnownProxies.Clear();
+app.UseForwardedHeaders(fwd);
+
 app.UseStaticFiles();
 app.UseRouting();
 
