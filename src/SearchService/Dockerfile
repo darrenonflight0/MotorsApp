@@ -24,4 +24,5 @@ RUN dotnet publish -c Release -o /app/out --no-restore
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build /app/out .
-ENTRYPOINT ["dotnet", "SearchService.dll"]
+EXPOSE 8080
+ENTRYPOINT ["sh", "-c", "ASPNETCORE_URLS=http://[::]:${PORT:-8080} exec dotnet SearchService.dll"]
