@@ -44,6 +44,7 @@ export const authOptions: AuthOptions = {
   providers: [
     DuendeIDS6Provider({
       id: 'id-server',
+      name: 'Yamkela Motors',
       clientId: 'nextApp',
       clientSecret: CLIENT_SECRET,
       issuer: process.env.ID_URL,
