@@ -66,36 +66,25 @@ public class DbInitializer
             Console.WriteLine("Admin user seeded");
         }
 
-        if (userManager.Users.Any()) return;
-
-        var bob = new ApplicationUser
-        {
-            UserName = "bob",
-            Email = "bob@test.com",
-            EmailConfirmed = true
-        };
-
-        userManager.CreateAsync(bob, "Pass123$word").Result.ToString();
-        userManager.AddClaimsAsync(bob, new Claim[]
-        {
-            new Claim(JwtClaimTypes.Name, "Bob Smith")
-        }).Wait();
-        userManager.AddToRoleAsync(bob, "User").Wait();
-
-        var alice = new ApplicationUser
-        {
-            UserName = "alice",
-            Email = "alice@test.com",
-            EmailConfirmed = true
-        };
-
-        userManager.CreateAsync(alice, "Pass123$word").Result.ToString();
-        userManager.AddClaimsAsync(alice, new Claim[]
-        {
-            new Claim(JwtClaimTypes.Name, "Alice Smith")
-        }).Wait();
-        userManager.AddToRoleAsync(alice, "User").Wait();
+        // Demo seller accounts. Seeded individually (like the admin above) so they
+        // exist even when the database already has other users — previously the
+        // blanket `Users.Any()` guard ran after the admin was created and skipped
+        // these entirely. NOTE: these are known-credential test accounts; remove
+        // them for a genuinely public launch.
+        SeedUser(userManager, "bob", "Bob Smith", "bob@test.com");
+        SeedUser(userManager, "alice", "Alice Smith", "alice@test.com");
 
         Console.WriteLine("Identity data seeded");
+    }
+
+    private static void SeedUser(UserManager<ApplicationUser> userManager,
+        string userName, string displayName, string email)
+    {
+        if (userManager.FindByNameAsync(userName).Result != null) return;
+
+        var user = new ApplicationUser { UserName = userName, Email = email, EmailConfirmed = true };
+        userManager.CreateAsync(user, "Pass123$word").Wait();
+        userManager.AddClaimsAsync(user, new[] { new Claim(JwtClaimTypes.Name, displayName) }).Wait();
+        userManager.AddToRoleAsync(user, "User").Wait();
     }
 }
