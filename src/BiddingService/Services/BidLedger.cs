@@ -29,7 +29,9 @@ public class BidLedger
 
         if (!string.IsNullOrWhiteSpace(inlinePem))
         {
-            _rsa.ImportFromPem(inlinePem);
+            // Some hosts (Railway, Heroku, etc.) can't hold multi-line env vars,
+            // so accept a single-line PEM with literal "\n" escapes too.
+            _rsa.ImportFromPem(inlinePem.Replace("\\n", "\n"));
             logger.LogInformation("SECURITY bid_ledger_key_loaded source=config");
         }
         else if (File.Exists(keyPath))
