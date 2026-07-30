@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace IdentityService.Controllers;
 
@@ -38,6 +39,37 @@ public class ProfileController : ControllerBase
             verified = user.IsVerified,
             profilePicture = user.ProfilePicture,
         });
+    }
+
+    /// <summary>Typeahead: sellers/auctioneers whose username matches, with the
+    /// bits the search dropdown needs (name, avatar, verified). Public.</summary>
+    [AllowAnonymous]
+    [HttpGet("search")]
+    public async Task<IActionResult> Search([FromQuery] string? q)
+    {
+        var term = (q ?? string.Empty).Trim();
+        if (term.Length < 1) return Ok(Array.Empty<object>());
+
+        var matches = await _userManager.Users
+            .Where(u => EF.Functions.ILike(u.UserName, $"%{term}%"))
+            .OrderBy(u => u.UserName)
+            .Take(6)
+            .ToListAsync();
+
+        var results = new List<object>();
+        foreach (var u in matches)
+        {
+            var claims = await _userManager.GetClaimsAsync(u);
+            var name = claims.FirstOrDefault(c => c.Type == JwtClaimTypes.Name)?.Value ?? u.UserName;
+            results.Add(new
+            {
+                username = u.UserName,
+                name,
+                verified = u.IsVerified,
+                profilePicture = u.ProfilePicture,
+            });
+        }
+        return Ok(results);
     }
 
     public record PictureDto(string ProfilePicture);

@@ -30,6 +30,19 @@ export type PublicProfile = {
   profilePicture?: string | null;
 };
 
+export type UserSuggestion = {
+  username: string;
+  name: string;
+  verified: boolean;
+  profilePicture?: string | null;
+};
+
+/** Typeahead lookup of sellers/auctioneers by username (for the search dropdown). */
+export async function searchUsers(q: string): Promise<UserSuggestion[]> {
+  const res = await fetchWrapper.get(`profile/search?q=${encodeURIComponent(q)}`);
+  return Array.isArray(res) ? res : [];
+}
+
 type Err = { error: { status: number; message: string } };
 
 export async function applyToSell(payload: {
