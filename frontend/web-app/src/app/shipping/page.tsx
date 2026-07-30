@@ -11,25 +11,25 @@ export const metadata = {
 const services = [
   {
     name: 'Ground transportation',
-    img: 'car,carrier,truck',
+    img: 'carcarrier',
     lock: 7,
     body: 'Inland haulage from the auction yard to the departure port on enclosed or open carriers, tracked at every handover.',
   },
   {
     name: 'RoRo (Roll-on/Roll-off)',
-    img: 'car,ferry,ship',
+    img: 'carferry',
     lock: 18,
     body: 'The most economical ocean option. Drivable vehicles are rolled onto a dedicated car vessel and secured on deck.',
   },
   {
     name: 'Container',
-    img: 'shipping,container,ship',
+    img: 'shippingcontainer',
     lock: 24,
     body: 'Shared or sole-use containers for extra protection, non-running vehicles, or when you want parts shipped alongside.',
   },
   {
     name: 'Air freight',
-    img: 'cargo,airplane',
+    img: 'cargoplane',
     lock: 31,
     body: 'Fastest door-to-port option for high-value or time-critical vehicles. Priced by weight and volume.',
   },
