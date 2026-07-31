@@ -15,7 +15,15 @@ public static class Config
     public static IEnumerable<ApiScope> ApiScopes =>
         new ApiScope[]
         {
-            new ApiScope("auctionApp", "Auction app full access"),
+            // Carry role/username/verified as user claims so IdentityServer emits
+            // them into the ACCESS token. Without this the API-side
+            // [Authorize(Roles="Admin")] guards (seller-verification review, escrow
+            // resolution, role management) never see the role and return 403 —
+            // which the admin UI shows as an empty list.
+            new ApiScope("auctionApp", "Auction app full access")
+            {
+                UserClaims = { "role", "username", "verified" },
+            },
         };
 
     public static IEnumerable<Client> Clients(IConfiguration config, bool isDevelopment)
