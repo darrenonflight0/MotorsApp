@@ -1,3 +1,4 @@
+import { listUsers, ManagedUser } from '@/app/actions/adminActions';
 import { getCurrentUser } from '@/app/actions/authActions';
 import { getAllEscrows, getDisputedEscrows } from '@/app/actions/escrowActions';
 import { getPendingApplications, ReviewApplication } from '@/app/actions/verificationActions';
@@ -5,6 +6,7 @@ import PageHero from '@/app/components/PageHero';
 import { Escrow } from '@/types';
 import Link from 'next/link';
 import AdminDashboard from './AdminDashboard';
+import AdminRoles from './AdminRoles';
 import SellerApplications from './SellerApplications';
 
 export const metadata = {
@@ -44,12 +46,14 @@ export default async function AdminPage() {
     );
   }
 
-  const [disputed, all, applications] = await Promise.all([
+  const [disputed, all, applications, admins] = await Promise.all([
     getDisputedEscrows(),
     getAllEscrows(),
     getPendingApplications(),
+    listUsers(''),
   ]);
   const apps: ReviewApplication[] = Array.isArray(applications) ? applications : [];
+  const adminUsers: ManagedUser[] = Array.isArray(admins) ? admins : [];
 
   return (
     <div className="space-y-12">
@@ -61,6 +65,7 @@ export default async function AdminPage() {
         />
       </div>
       <SellerApplications initial={apps} />
+      <AdminRoles initial={adminUsers} />
       <AdminDashboard initialDisputed={asArray(disputed)} initialAll={asArray(all)} />
     </div>
   );
