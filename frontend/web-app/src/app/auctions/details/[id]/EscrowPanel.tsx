@@ -81,6 +81,9 @@ export default function EscrowPanel({ auctionId, username }: Props) {
   if (!isBuyer && !isSeller) return null;
 
   const status = statusCopy[escrow.status];
+  const premiumPct = escrow.buyerPremiumPercent ?? 7;
+  const premium = escrow.buyerPremium ?? Math.round((escrow.amount * premiumPct) / 100);
+  const total = escrow.total ?? escrow.amount + premium;
 
   return (
     <div className="rounded-xl border border-line/80 bg-surface shadow-lot">
@@ -107,12 +110,33 @@ export default function EscrowPanel({ auctionId, username }: Props) {
 
         <p className="mt-3 text-sm text-muted">{status.hint}</p>
 
+        {isBuyer && escrow.status === 'AwaitingDeposit' && (
+          <div className="mt-4 rounded-lg border border-line/70 bg-canvas p-3 text-sm">
+            <div className="flex justify-between text-muted">
+              <span>Winning bid</span>
+              <span className="readout text-fg">${numberWithCommas(escrow.amount)}</span>
+            </div>
+            <div className="mt-1 flex justify-between text-muted">
+              <span>Buyer&apos;s premium ({premiumPct}%)</span>
+              <span className="readout text-fg">${numberWithCommas(premium)}</span>
+            </div>
+            <div className="mt-2 flex justify-between border-t border-line/70 pt-2 font-display font-bold text-fg">
+              <span>Total to pay</span>
+              <span className="readout">${numberWithCommas(total)}</span>
+            </div>
+            <p className="mt-2 text-xs leading-relaxed text-muted">
+              A {premiumPct}% buyer&apos;s premium is added to the winning bid at checkout. The seller
+              receives the bid; the premium is Yamkela&apos;s fee.
+            </p>
+          </div>
+        )}
+
         <div className="mt-4 flex flex-wrap gap-3">
           {isBuyer && escrow.status === 'AwaitingDeposit' && (
             escrow.fundsAreReal && escrow.activeProvider === 'Paystack' ? (
               <PaystackDepositButton
                 auctionId={auctionId}
-                amount={escrow.amount}
+                amount={total}
                 // TODO: surface the buyer's real email (add the OIDC `email` scope);
                 // a reserved placeholder is fine for Paystack test mode.
                 email={`${username}@example.com`}

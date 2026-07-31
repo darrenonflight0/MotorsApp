@@ -47,10 +47,10 @@ const steps = [
   },
   {
     title: 'Fees',
-    body: 'A transparent buyer fee applies per vehicle, plus shipping and any destination duties. All charges are itemised up front with no hidden mark-ups.',
+    body: 'A 7% buyer’s premium is added to your winning bid at checkout, plus shipping and any destination duties. Every charge is itemised up front with no hidden mark-ups.',
     img: 'invoice',
     lock: 35,
-    caption: 'Every charge is itemised up front, no surprises.',
+    caption: 'A 7% buyer’s premium applies, itemised up front.',
   },
 ];
 

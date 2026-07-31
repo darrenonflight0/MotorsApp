@@ -1,7 +1,9 @@
 using BiddingService.Models;
+using BiddingService.Services;
 using BiddingService.Services.Payments;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using MongoDB.Entities;
 
 namespace BiddingService.Controllers;
@@ -13,34 +15,46 @@ public class EscrowController : ControllerBase
 {
     private readonly ILogger<EscrowController> _logger;
     private readonly IEscrowPaymentProvider _payments;
+    private readonly IConfiguration _config;
 
-    public EscrowController(ILogger<EscrowController> logger, IEscrowPaymentProvider payments)
+    public EscrowController(ILogger<EscrowController> logger, IEscrowPaymentProvider payments, IConfiguration config)
     {
         _logger = logger;
         _payments = payments;
+        _config = config;
     }
 
     private string Username => User.Identity!.Name;
     private bool IsAdmin => User.IsInRole("Admin");
 
-    private object ToDto(Escrow e) => new
+    private object ToDto(Escrow e)
     {
-        id = e.ID,
-        auctionId = e.AuctionId,
-        seller = e.Seller,
-        buyer = e.Buyer,
-        amount = e.Amount,
-        status = e.Status.ToString(),
-        createdAt = e.CreatedAt,
-        fundedAt = e.FundedAt,
-        closedAt = e.ClosedAt,
-        paymentProvider = e.PaymentProvider,
-        // The currently-configured provider, so the UI can pick the right
-        // checkout (e.g. Paystack) even before a deposit has been recorded.
-        activeProvider = _payments.Name,
-        // Lets the UI clearly disclose when funds are simulated rather than real.
-        fundsAreReal = _payments.HandlesRealFunds,
-    };
+        var percent = PlatformFees.BuyerPremiumPercent(_config);
+        var premium = PlatformFees.Premium(e.Amount, percent);
+        return new
+        {
+            id = e.ID,
+            auctionId = e.AuctionId,
+            seller = e.Seller,
+            buyer = e.Buyer,
+            // Amount = the seller's proceeds (winning bid). The buyer pays `total`
+            // (bid + buyer's premium); the platform keeps the premium.
+            amount = e.Amount,
+            buyerPremiumPercent = percent,
+            buyerPremium = premium,
+            total = e.Amount + premium,
+            status = e.Status.ToString(),
+            createdAt = e.CreatedAt,
+            fundedAt = e.FundedAt,
+            closedAt = e.ClosedAt,
+            paymentProvider = e.PaymentProvider,
+            // The currently-configured provider, so the UI can pick the right
+            // checkout (e.g. Paystack) even before a deposit has been recorded.
+            activeProvider = _payments.Name,
+            // Lets the UI clearly disclose when funds are simulated rather than real.
+            fundsAreReal = _payments.HandlesRealFunds,
+        };
+    }
 
     [HttpGet("{auctionId}")]
     public async Task<ActionResult> GetForAuction(string auctionId)

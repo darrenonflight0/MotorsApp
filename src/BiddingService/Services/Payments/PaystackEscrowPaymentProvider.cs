@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Net.Http.Headers;
 using BiddingService.Models;
+using BiddingService.Services;
 
 namespace BiddingService.Services.Payments;
 
@@ -20,6 +21,7 @@ public class PaystackEscrowPaymentProvider : IEscrowPaymentProvider
     private readonly HttpClient _http;
     private readonly ILogger<PaystackEscrowPaymentProvider> _logger;
     private readonly string _currency;
+    private readonly int _buyerPremiumPercent;
 
     public PaystackEscrowPaymentProvider(HttpClient http, IConfiguration config, ILogger<PaystackEscrowPaymentProvider> logger)
     {
@@ -27,6 +29,7 @@ public class PaystackEscrowPaymentProvider : IEscrowPaymentProvider
         var secretKey = config["Payments:Paystack:SecretKey"]
             ?? throw new InvalidOperationException("Payments:Paystack:SecretKey is required to use the Paystack provider.");
         _currency = config["Payments:Paystack:Currency"] ?? "NGN";
+        _buyerPremiumPercent = PlatformFees.BuyerPremiumPercent(config);
 
         _http = http;
         _http.BaseAddress ??= new Uri("https://api.paystack.co/");
@@ -57,8 +60,11 @@ public class PaystackEscrowPaymentProvider : IEscrowPaymentProvider
         var paid = data.TryGetProperty("amount", out var a) && a.TryGetInt64(out var amt) ? amt : 0;
         if (txStatus != "success")
             return PaymentResult.Fail($"Paystack transaction not successful (status={txStatus}).");
-        if (paid < MinorUnits(escrow.Amount))
-            return PaymentResult.Fail("Paystack transaction amount is less than the escrow amount.");
+
+        // Buyer must have paid the winning bid plus the buyer's premium.
+        var due = PlatformFees.Total(escrow.Amount, _buyerPremiumPercent);
+        if (paid < MinorUnits(due))
+            return PaymentResult.Fail("Paystack transaction amount is less than the amount due (bid + buyer's premium).");
 
         return PaymentResult.Ok(paymentReference, "deposit verified");
     }

@@ -52,6 +52,9 @@ export type Escrow = {
   seller: string;
   buyer: string;
   amount: number;
+  buyerPremiumPercent?: number;
+  buyerPremium?: number;
+  total?: number;
   status: 'AwaitingDeposit' | 'Funded' | 'Released' | 'Refunded' | 'Disputed';
   createdAt: string;
   fundedAt?: string;
