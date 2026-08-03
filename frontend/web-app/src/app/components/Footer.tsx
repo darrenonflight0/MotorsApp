@@ -28,7 +28,8 @@ const groups = [
     heading: 'Legal',
     links: [
       { href: '/terms', label: 'Terms of Service' },
-      { href: '/privacy', label: 'Privacy & Cookies' },
+      { href: '/privacy', label: 'Privacy Policy' },
+      { href: '/cookies', label: 'Cookie Policy' },
     ],
   },
 ];
@@ -69,6 +70,9 @@ export default function Footer() {
             </Link>
             <Link href="/privacy" className="transition-colors hover:text-paper">
               Privacy
+            </Link>
+            <Link href="/cookies" className="transition-colors hover:text-paper">
+              Cookies
             </Link>
             <span className="hidden sm:inline">
               We never ask for your password or card details by email or phone.

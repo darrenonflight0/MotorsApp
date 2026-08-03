@@ -86,9 +86,14 @@ export default function CookieConsent() {
               <p className="mt-1 text-sm leading-relaxed text-muted">
                 We use strictly-necessary cookies to run Yamkela Motors (sign-in, security,
                 your watchlist). With your consent we also use optional analytics cookies to
-                understand how the marketplace is used. You can change your choice at any time.{' '}
+                understand how the marketplace is used. You can change your choice at any time. See
+                our{' '}
+                <Link href="/cookies" className="font-medium text-redline hover:text-redline-deep">
+                  Cookie Policy
+                </Link>{' '}
+                and{' '}
                 <Link href="/privacy" className="font-medium text-redline hover:text-redline-deep">
-                  Privacy &amp; Cookie Policy
+                  Privacy Policy
                 </Link>
                 .
               </p>
