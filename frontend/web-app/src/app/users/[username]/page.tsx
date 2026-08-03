@@ -1,8 +1,11 @@
 import { getData } from '@/app/actions/auctionActions';
+import { getCurrentUser } from '@/app/actions/authActions';
+import { getMyEscrows } from '@/app/actions/escrowActions';
 import { getPublicProfile } from '@/app/actions/verificationActions';
 import AuctionCard from '@/app/auctions/AuctionCard';
 import VerifiedBadge from '@/app/components/VerifiedBadge';
-import { Auction, PagedResult } from '@/types';
+import { Auction, Escrow, PagedResult } from '@/types';
+import AccountSummary from './AccountSummary';
 
 type Props = {
   params: { username: string };
@@ -21,12 +24,17 @@ async function safeGet(query: string): Promise<PagedResult<Auction>> {
 export default async function UserPage({ params }: Props) {
   const username = decodeURIComponent(params.username);
 
-  const [selling, won, profileRes] = await Promise.all([
+  const currentUser = await getCurrentUser();
+  const isOwner = currentUser?.username?.toLowerCase() === username.toLowerCase();
+
+  const [selling, won, profileRes, escrowRes] = await Promise.all([
     safeGet(`?seller=${encodeURIComponent(username)}&pageSize=12&orderBy=new`),
     safeGet(`?winner=${encodeURIComponent(username)}&pageSize=12&orderBy=new`),
     getPublicProfile(username),
+    isOwner ? getMyEscrows() : Promise.resolve([] as Escrow[]),
   ]);
   const profile = profileRes && !('error' in profileRes) ? profileRes : null;
+  const myEscrows: Escrow[] = Array.isArray(escrowRes) ? escrowRes : [];
 
   const liveCount = selling.results.filter(
     (a) => new Date(a.auctionEnd) > new Date()
@@ -69,6 +77,8 @@ export default async function UserPage({ params }: Props) {
           </div>
         </div>
       </section>
+
+      {isOwner && <AccountSummary username={username} escrows={myEscrows} />}
 
       <section>
         <h2 className="mb-4 font-display text-2xl font-bold tracking-tight text-fg">
