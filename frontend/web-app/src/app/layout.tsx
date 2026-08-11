@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Archivo, Public_Sans } from 'next/font/google';
 import localFont from 'next/font/local';
 import './globals.css';
@@ -29,8 +29,22 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://yamkelamotors.up.railway.app'),
   title: 'Yamkela Motors — Live Car Auctions',
   description: 'Your Bid. Your Drive. Your Way.',
+  applicationName: 'Yamkela Motors',
+  appleWebApp: { capable: true, title: 'Yamkela', statusBarStyle: 'black-translucent' },
+  openGraph: {
+    type: 'website',
+    siteName: 'Yamkela Motors',
+    title: 'Yamkela Motors — Live Car Auctions',
+    description: 'Your Bid. Your Drive. Your Way.',
+  },
+  twitter: { card: 'summary_large_image' },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#0e1116',
 };
 
 // Set the theme class before first paint to avoid a flash of the wrong theme.
