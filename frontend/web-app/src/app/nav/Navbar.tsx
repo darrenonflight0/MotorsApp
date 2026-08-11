@@ -1,4 +1,6 @@
 import { getCurrentUser } from '@/app/actions/authActions';
+import Link from 'next/link';
+import { HiOutlineShieldCheck } from 'react-icons/hi';
 import Logo from './Logo';
 import Search from './Search';
 import LoginButton from './LoginButton';
@@ -11,6 +13,7 @@ import ThemeToggle from './ThemeToggle';
 
 export default async function Navbar() {
   const user = await getCurrentUser();
+  const isAdmin = !!user && (Array.isArray(user.role) ? user.role.includes('Admin') : user.role === 'Admin');
 
   return (
     <header className="sticky top-0 z-40 border-b border-line/70 bg-surface/85 backdrop-blur-md">
@@ -28,6 +31,14 @@ export default async function Navbar() {
             <WatchlistBell />
             <NotificationBell />
           </div>
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className="hidden items-center gap-1 rounded-lg border border-redline/40 px-3 py-1.5 font-display text-xs font-bold uppercase tracking-wide text-redline transition-colors hover:bg-redline hover:text-paper sm:inline-flex"
+            >
+              <HiOutlineShieldCheck className="h-4 w-4" /> Admin
+            </Link>
+          )}
           {user ? (
             <span className="hidden sm:block">
               <UserActions user={user} />

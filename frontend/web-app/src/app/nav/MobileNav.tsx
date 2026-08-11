@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { HiChevronRight, HiMenu, HiX } from 'react-icons/hi';
+import { HiChevronRight, HiMenu, HiOutlineShieldCheck, HiX } from 'react-icons/hi';
 import ThemeToggle from './ThemeToggle';
 import WatchlistBell from './WatchlistBell';
 import NotificationBell from './NotificationBell';
@@ -32,6 +32,7 @@ export default function MobileNav({ user }: { user?: NavUser | null }) {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
+  const isAdmin = !!user && (Array.isArray(user.role) ? user.role.includes('Admin') : user.role === 'Admin');
 
   useEffect(() => setMounted(true), []);
 
@@ -92,6 +93,17 @@ export default function MobileNav({ user }: { user?: NavUser | null }) {
             </div>
 
             <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-3">
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  className="mb-1 flex items-center justify-between rounded-lg border border-redline/40 bg-redline/5 px-4 py-3 font-display text-base font-bold text-redline"
+                >
+                  <span className="flex items-center gap-2">
+                    <HiOutlineShieldCheck className="h-5 w-5" /> Admin dashboard
+                  </span>
+                  <HiChevronRight className="h-4 w-4 opacity-40" />
+                </Link>
+              )}
               {links.map((l, i) => {
                 const active = l.href === '/' ? pathname === '/' : pathname.startsWith(l.href);
                 return (
