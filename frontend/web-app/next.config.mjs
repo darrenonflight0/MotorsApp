@@ -17,6 +17,25 @@ const nextConfig = {
     // server actions; raise the default 1 MB body limit to accommodate them.
     serverActions: { bodySizeLimit: '8mb' },
   },
+  async headers() {
+    // Security headers. Anti-clickjacking (frame-ancestors/X-Frame-Options),
+    // MIME-sniffing, referrer and transport hardening. `camera=(self)` keeps the
+    // seller-verification capture working. Deliberately no restrictive script-src
+    // CSP here — it would break Next's inline runtime and the Paystack widget.
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'Content-Security-Policy', value: "frame-ancestors 'none'" },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(self), microphone=(), geolocation=()' },
+          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains' },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -30,8 +30,10 @@ public class EmailSender : IAppEmailSender
 
         if (string.IsNullOrEmpty(host))
         {
+            // Never log the body — it can contain password-reset links/tokens.
             _logger.LogWarning(
-                "SMTP not configured. Email to {To} — {Subject}:\n{Body}", to, subject, htmlBody);
+                "SMTP not configured — email to {To} ({Subject}) was NOT sent. Configure Smtp:Host.",
+                to, subject);
             return;
         }
 

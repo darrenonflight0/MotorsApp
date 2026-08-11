@@ -31,7 +31,15 @@ public static class Config
         // Client secrets come from configuration (env vars / user-secrets / key vault)
         // so no real secret is ever committed to source. The literals below are
         // development-only fallbacks; production MUST override them.
-        var nextSecret = config["IdentityServer:Clients:nextApp:Secret"] ?? "secret";
+        var nextSecret = config["IdentityServer:Clients:nextApp:Secret"];
+        if (string.IsNullOrWhiteSpace(nextSecret))
+        {
+            if (!isDevelopment)
+                throw new InvalidOperationException(
+                    "IdentityServer:Clients:nextApp:Secret must be configured in production. " +
+                    "Refusing to start with a weak default client secret.");
+            nextSecret = "secret"; // development convenience only
+        }
 
         var clients = new List<Client>
         {
@@ -41,7 +49,7 @@ public static class Config
                 ClientName = "nextApp",
                 ClientSecrets = { new Secret(nextSecret.Sha256()) },
                 AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
-                RequirePkce = false,
+                RequirePkce = true,
                 RedirectUris = { config["ClientApp"] + "/api/auth/callback/id-server" },
                 AllowOfflineAccess = true,
                 AllowedScopes = { "openid", "profile", "roles", "auctionApp", "offline_access" },

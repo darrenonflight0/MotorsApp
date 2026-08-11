@@ -147,6 +147,18 @@ fwd.KnownNetworks.Clear();
 fwd.KnownProxies.Clear();
 app.UseForwardedHeaders(fwd);
 
+// Security headers — chiefly anti-clickjacking on the hosted login/consent
+// pages so they can't be framed and overlaid to steal credentials.
+app.Use(async (ctx, next) =>
+{
+    var h = ctx.Response.Headers;
+    h["X-Frame-Options"] = "DENY";
+    h["Content-Security-Policy"] = "frame-ancestors 'none'";
+    h["X-Content-Type-Options"] = "nosniff";
+    h["Referrer-Policy"] = "strict-origin-when-cross-origin";
+    await next();
+});
+
 app.UseStaticFiles();
 app.UseRouting();
 
