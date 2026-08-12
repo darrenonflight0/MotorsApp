@@ -77,36 +77,38 @@ var idsvcBuilder = builder.Services.AddIdentityServer(options =>
         options.TokenCleanupInterval = 3600;
     });
 
-// Signing key: a persisted developer key locally, a managed X.509 certificate in
-// production. Refuse to start in production without one rather than silently
-// falling back to an ephemeral key that rotates on every restart/instance.
-if (builder.Environment.IsDevelopment())
+// Signing key. A configured static X.509 certificate is honoured in ANY
+// environment so the key stays stable across redeploys and instances — Railway's
+// filesystem is ephemeral, so the auto-generated developer key would otherwise
+// rotate on every deploy and silently invalidate every live token. A developer
+// key is used only in Development when no certificate is supplied; outside
+// Development a certificate is mandatory.
+var certBase64 = builder.Configuration["IdentityServer:SigningCredential:Pfx"];
+var certPath = builder.Configuration["IdentityServer:SigningCredential:Path"];
+var certPassword = builder.Configuration["IdentityServer:SigningCredential:Password"];
+
+if (!string.IsNullOrWhiteSpace(certBase64))
+{
+    // Hosts without mounted secret files (Railway, etc.) inject the .pfx as
+    // base64 in an env var. EphemeralKeySet keeps the private key in memory.
+    idsvcBuilder.AddSigningCredential(new X509Certificate2(
+        Convert.FromBase64String(certBase64), certPassword, X509KeyStorageFlags.EphemeralKeySet));
+}
+else if (!string.IsNullOrWhiteSpace(certPath) && File.Exists(certPath))
+{
+    idsvcBuilder.AddSigningCredential(new X509Certificate2(certPath, certPassword));
+}
+else if (builder.Environment.IsDevelopment())
 {
     idsvcBuilder.AddDeveloperSigningCredential();
 }
 else
 {
-    var certBase64 = builder.Configuration["IdentityServer:SigningCredential:Pfx"];
-    var certPath = builder.Configuration["IdentityServer:SigningCredential:Path"];
-    var certPassword = builder.Configuration["IdentityServer:SigningCredential:Password"];
-    if (!string.IsNullOrWhiteSpace(certBase64))
-    {
-        // Hosts without mounted secret files (Railway, etc.) inject the .pfx as
-        // base64 in an env var. EphemeralKeySet keeps the private key in memory.
-        idsvcBuilder.AddSigningCredential(new X509Certificate2(
-            Convert.FromBase64String(certBase64), certPassword, X509KeyStorageFlags.EphemeralKeySet));
-    }
-    else if (!string.IsNullOrWhiteSpace(certPath) && File.Exists(certPath))
-    {
-        idsvcBuilder.AddSigningCredential(new X509Certificate2(certPath, certPassword));
-    }
-    else
-    {
-        throw new InvalidOperationException(
-            "Production requires a signing certificate: set IdentityServer:SigningCredential:Pfx " +
-            "(base64 of a .pfx) or IdentityServer:SigningCredential:Path. " +
-            "Refusing to start with an ephemeral developer key.");
-    }
+    throw new InvalidOperationException(
+        "A signing certificate is required outside Development: set " +
+        "IdentityServer:SigningCredential:Pfx (base64 of a .pfx) or " +
+        "IdentityServer:SigningCredential:Path. Refusing to start with an " +
+        "ephemeral developer key that rotates on every deploy.");
 }
 
 builder.Services.ConfigureApplicationCookie(options =>
