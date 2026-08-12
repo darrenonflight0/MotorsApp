@@ -49,14 +49,17 @@ var idsvcBuilder = builder.Services.AddIdentityServer(options =>
     options.Events.RaiseSuccessEvents = true;
     options.EmitStaticAudienceClaim = true;
 
-    // Pin signing to the one static credential added below (dev key locally, the
-    // configured X.509 cert in production). Duende's Automatic Key Management is
-    // ON by default and mints its OWN rotating signing keys, persisted per host —
-    // on an ephemeral filesystem (Railway) those rotate on every redeploy, so any
-    // token signed by a rotated-out key fails signature validation at the gateway
-    // with a bare 401 that NextAuth can't detect. Disabling it guarantees exactly
-    // one stable signing key across every deploy and instance.
-    options.KeyManagement.Enabled = false;
+    // Signing keys use Duende's Automatic Key Management, persisted in the
+    // operational store (Postgres, configured below) so they are generated once
+    // and survive every redeploy and instance — the correct model for an
+    // ephemeral container filesystem like Railway, with no certificate to
+    // hand-carry. DataProtectKeys=false stores the keys unencrypted in the DB
+    // (already the trust boundary): the default wraps them with ASP.NET Data
+    // Protection, whose own keyring is ephemeral here, so after a redeploy the
+    // persisted keys could no longer be decrypted and IdentityServer would
+    // silently mint fresh ones — rotating the signing key and 401-ing every
+    // existing token at the gateway.
+    options.KeyManagement.DataProtectKeys = false;
 
     var issuerUri = builder.Configuration["IssuerUri"];
     if (!string.IsNullOrEmpty(issuerUri)) options.IssuerUri = issuerUri;
@@ -77,39 +80,11 @@ var idsvcBuilder = builder.Services.AddIdentityServer(options =>
         options.TokenCleanupInterval = 3600;
     });
 
-// Signing key. A configured static X.509 certificate is honoured in ANY
-// environment so the key stays stable across redeploys and instances — Railway's
-// filesystem is ephemeral, so the auto-generated developer key would otherwise
-// rotate on every deploy and silently invalidate every live token. A developer
-// key is used only in Development when no certificate is supplied; outside
-// Development a certificate is mandatory.
-var certBase64 = builder.Configuration["IdentityServer:SigningCredential:Pfx"];
-var certPath = builder.Configuration["IdentityServer:SigningCredential:Path"];
-var certPassword = builder.Configuration["IdentityServer:SigningCredential:Password"];
-
-if (!string.IsNullOrWhiteSpace(certBase64))
-{
-    // Hosts without mounted secret files (Railway, etc.) inject the .pfx as
-    // base64 in an env var. EphemeralKeySet keeps the private key in memory.
-    idsvcBuilder.AddSigningCredential(new X509Certificate2(
-        Convert.FromBase64String(certBase64), certPassword, X509KeyStorageFlags.EphemeralKeySet));
-}
-else if (!string.IsNullOrWhiteSpace(certPath) && File.Exists(certPath))
-{
-    idsvcBuilder.AddSigningCredential(new X509Certificate2(certPath, certPassword));
-}
-else if (builder.Environment.IsDevelopment())
-{
-    idsvcBuilder.AddDeveloperSigningCredential();
-}
-else
-{
-    throw new InvalidOperationException(
-        "A signing certificate is required outside Development: set " +
-        "IdentityServer:SigningCredential:Pfx (base64 of a .pfx) or " +
-        "IdentityServer:SigningCredential:Path. Refusing to start with an " +
-        "ephemeral developer key that rotates on every deploy.");
-}
+// No static signing credential is registered: IdentityServer signs with the
+// Automatic Key Management keys persisted in the operational store (see the
+// options above). Any IdentityServer:SigningCredential:* configuration is
+// intentionally ignored, so a stale or malformed certificate env var can never
+// crash startup.
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
