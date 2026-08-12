@@ -56,7 +56,13 @@ public static class Config
 
                 // Short-lived access tokens; sessions continue via rotating refresh tokens.
                 AccessTokenLifetime = 60 * 15,
-                RefreshTokenUsage = TokenUsage.OneTimeOnly,
+                // Reusable (not one-time) refresh tokens: NextAuth's jwt callback
+                // can refresh from more than one request, and one-time rotation made
+                // the second lose the race -> RefreshAccessTokenError -> the server
+                // then calls APIs (admin verification list, etc.) with a dead token
+                // and gets 401, which the UI renders as "nothing here". Access tokens
+                // stay short-lived (15 min), so the exposure is limited.
+                RefreshTokenUsage = TokenUsage.ReUse,
                 RefreshTokenExpiration = TokenExpiration.Sliding,
                 SlidingRefreshTokenLifetime = 3600 * 24 * 14,
                 UpdateAccessTokenClaimsOnRefresh = true,
