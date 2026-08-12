@@ -55,7 +55,11 @@ public static class Config
                 AllowedScopes = { "openid", "profile", "roles", "auctionApp", "offline_access" },
 
                 // Short-lived access tokens; sessions continue via rotating refresh tokens.
-                AccessTokenLifetime = 60 * 15,
+                // 1-hour access token (was 15 min). Long enough that a normal
+                // admin session never needs a mid-session refresh, so the admin
+                // pages don't fail on a stale token; reusable refresh (below)
+                // covers longer sessions.
+                AccessTokenLifetime = 60 * 60,
                 // Reusable (not one-time) refresh tokens: NextAuth's jwt callback
                 // can refresh from more than one request, and one-time rotation made
                 // the second lose the race -> RefreshAccessTokenError -> the server
