@@ -3,6 +3,7 @@
 import { placeBidForAuction } from '@/app/actions/bidActions';
 import { useBidStore } from '@/hooks/useBidStore';
 import { numberWithCommas } from '@/lib/format';
+import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { FieldValues, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
@@ -27,7 +28,16 @@ export default function BidForm({ auctionId, highBid }: Props) {
       reset();
       toast.success(`Bid placed: $${numberWithCommas(+data.amount)}`);
     } catch (err: unknown) {
+      const status = (err as { status?: number })?.status;
       const message = err instanceof Error ? err.message : (err as { message?: string })?.message;
+      // A 401 here means the access token was missing or rejected but the session
+      // wasn't flagged for refresh, so SessionGuard never kicked in. Re-run the
+      // OIDC flow so the bid can be retried with a fresh token.
+      if (status === 401) {
+        toast.error('Your session expired — signing you back in…');
+        signIn('id-server');
+        return;
+      }
       toast.error(message || 'Could not place bid');
     } finally {
       setSubmitting(false);

@@ -49,6 +49,15 @@ var idsvcBuilder = builder.Services.AddIdentityServer(options =>
     options.Events.RaiseSuccessEvents = true;
     options.EmitStaticAudienceClaim = true;
 
+    // Pin signing to the one static credential added below (dev key locally, the
+    // configured X.509 cert in production). Duende's Automatic Key Management is
+    // ON by default and mints its OWN rotating signing keys, persisted per host —
+    // on an ephemeral filesystem (Railway) those rotate on every redeploy, so any
+    // token signed by a rotated-out key fails signature validation at the gateway
+    // with a bare 401 that NextAuth can't detect. Disabling it guarantees exactly
+    // one stable signing key across every deploy and instance.
+    options.KeyManagement.Enabled = false;
+
     var issuerUri = builder.Configuration["IssuerUri"];
     if (!string.IsNullOrEmpty(issuerUri)) options.IssuerUri = issuerUri;
 })

@@ -67,9 +67,22 @@ async function handleResponse(response: Response) {
     return data || response.statusText;
   } else {
     console.log('[fetchWrapper] NON-OK', response.status, response.url, 'body:', typeof data === 'string' ? data : JSON.stringify(data));
+    // Prefer a real message from the body; otherwise synthesise one that names
+    // the status, so an empty-body error (e.g. a bare 401 from the gateway)
+    // never surfaces as a blank/generic toast that hides the actual cause.
+    const bodyMessage =
+      typeof data === 'string'
+        ? data
+        : (data && typeof data === 'object' && 'error' in data
+            ? (data as { error?: string }).error
+            : undefined);
+    const fallback =
+      response.status === 401
+        ? 'Your session has expired. Please sign in again.'
+        : `Request failed (${response.status}${response.statusText ? ` ${response.statusText}` : ''}).`;
     const error = {
       status: response.status,
-      message: typeof data === 'string' ? data : response.statusText,
+      message: bodyMessage && bodyMessage.trim() ? bodyMessage : fallback,
     };
     return { error };
   }
