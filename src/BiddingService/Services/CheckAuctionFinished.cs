@@ -50,11 +50,21 @@ public class CheckAuctionFinished : BackgroundService
             auction.Finished = true;
             await auction.SaveAsync(null, stoppingToken);
 
-            var winningBid = await DB.Find<Bid>()
+            // A bidder who already defaulted on this lot (winner ghosted, escrow
+            // Defaulted) cannot win it again on a relist.
+            var defaultedBuyers = (await DB.Find<Escrow>()
+                    .Match(e => e.AuctionId == auction.ID && e.Status == EscrowStatus.Defaulted)
+                    .ExecuteAsync(stoppingToken))
+                .Select(e => e.Buyer)
+                .ToHashSet();
+
+            var acceptedBids = await DB.Find<Bid>()
                 .Match(a => a.AuctionId == auction.ID)
                 .Match(b => b.BidStatus == BidStatus.Accepted)
                 .Sort(x => x.Descending(s => s.Amount))
-                .ExecuteFirstAsync(stoppingToken);
+                .ExecuteAsync(stoppingToken);
+
+            var winningBid = acceptedBids.FirstOrDefault(b => !defaultedBuyers.Contains(b.Bidder));
 
             // Sold lots settle through escrow: funds are held by the platform
             // until the buyer confirms delivery.
