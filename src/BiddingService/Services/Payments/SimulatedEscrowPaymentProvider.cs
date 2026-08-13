@@ -37,4 +37,21 @@ public class SimulatedEscrowPaymentProvider : IEscrowPaymentProvider
         _logger.LogInformation("PAYMENT simulated_refund auction={Auction} buyer={Buyer} amount={Amount}", escrow.AuctionId, escrow.Buyer, escrow.Amount);
         return Task.FromResult(PaymentResult.Ok($"sim_ref_{Guid.NewGuid():N}", "simulated refund to buyer"));
     }
+
+    public Task<IReadOnlyList<PayoutBank>> ListPayoutBanksAsync(string currency, CancellationToken ct = default)
+    {
+        IReadOnlyList<PayoutBank> banks = new[]
+        {
+            new PayoutBank("Demo Bank", "demo-001"),
+            new PayoutBank("Test Savings & Loan", "demo-002"),
+        };
+        return Task.FromResult(banks);
+    }
+
+    public Task<RecipientResult> CreatePayoutRecipientAsync(PayoutRecipientRequest request, CancellationToken ct = default)
+    {
+        var last4 = request.AccountNumber is { Length: >= 4 } n ? n[^4..] : "0000";
+        _logger.LogInformation("PAYMENT simulated_recipient bank={Bank} last4={Last4}", request.BankCode, last4);
+        return Task.FromResult(RecipientResult.Ok($"sim_rcp_{Guid.NewGuid():N}", "Demo Bank", last4));
+    }
 }

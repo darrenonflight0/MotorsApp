@@ -6,6 +6,7 @@ import AuctionCard from '@/app/auctions/AuctionCard';
 import VerifiedBadge from '@/app/components/VerifiedBadge';
 import { Auction, Escrow, PagedResult } from '@/types';
 import AccountSummary from './AccountSummary';
+import PayoutSettings from './PayoutSettings';
 
 type Props = {
   params: { username: string };
@@ -79,6 +80,7 @@ export default async function UserPage({ params }: Props) {
       </section>
 
       {isOwner && <AccountSummary username={username} escrows={myEscrows} />}
+      {isOwner && <PayoutSettings />}
 
       <section>
         <h2 className="mb-4 font-display text-2xl font-bold tracking-tight text-fg">

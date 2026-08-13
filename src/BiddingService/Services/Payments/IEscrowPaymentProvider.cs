@@ -25,6 +25,34 @@ public interface IEscrowPaymentProvider
 
     /// <summary>Refund held funds to the buyer.</summary>
     Task<PaymentResult> RefundBuyerAsync(Escrow escrow, CancellationToken ct = default);
+
+    /// <summary>
+    /// Banks the seller can be paid out to, for the given settlement currency.
+    /// Empty when the provider onboards payouts a different way (e.g. Stripe
+    /// Connect hosted onboarding).
+    /// </summary>
+    Task<IReadOnlyList<PayoutBank>> ListPayoutBanksAsync(string currency, CancellationToken ct = default);
+
+    /// <summary>
+    /// Register a seller's bank account as a payout destination, returning the
+    /// provider handle (transfer-recipient / connected-account id) that
+    /// <see cref="ReleaseToSellerAsync"/> later pays into.
+    /// </summary>
+    Task<RecipientResult> CreatePayoutRecipientAsync(PayoutRecipientRequest request, CancellationToken ct = default);
+}
+
+/// <summary>A bank a seller can select when registering a payout destination.</summary>
+public record PayoutBank(string Name, string Code);
+
+/// <summary>Details a seller supplies to register a payout destination.</summary>
+public record PayoutRecipientRequest(string BankCode, string AccountNumber, string AccountName, string Currency);
+
+/// <summary>Outcome of registering a payout destination.</summary>
+public record RecipientResult(bool Success, string RecipientCode, string BankName, string AccountLast4, string Message)
+{
+    public static RecipientResult Ok(string code, string bankName, string last4) =>
+        new(true, code, bankName, last4, "ok");
+    public static RecipientResult Fail(string message) => new(false, null, null, null, message);
 }
 
 /// <summary>Outcome of a payment operation.</summary>

@@ -21,7 +21,18 @@ public class PaystackEscrowPaymentProvider : IEscrowPaymentProvider
     private readonly HttpClient _http;
     private readonly ILogger<PaystackEscrowPaymentProvider> _logger;
     private readonly string _currency;
+    private readonly string _recipientType;
     private readonly int _buyerPremiumPercent;
+
+    // Paystack's transfer-recipient "type" is country/currency specific. Default
+    // by settlement currency; override with Payments:Paystack:RecipientType.
+    private static readonly Dictionary<string, string> RecipientTypeByCurrency = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["NGN"] = "nuban",
+        ["GHS"] = "ghipss",
+        ["ZAR"] = "basa",
+        ["KES"] = "mobile_money",
+    };
 
     public PaystackEscrowPaymentProvider(HttpClient http, IConfiguration config, ILogger<PaystackEscrowPaymentProvider> logger)
     {
@@ -29,6 +40,8 @@ public class PaystackEscrowPaymentProvider : IEscrowPaymentProvider
         var secretKey = config["Payments:Paystack:SecretKey"]
             ?? throw new InvalidOperationException("Payments:Paystack:SecretKey is required to use the Paystack provider.");
         _currency = config["Payments:Paystack:Currency"] ?? "NGN";
+        _recipientType = config["Payments:Paystack:RecipientType"]
+            ?? (RecipientTypeByCurrency.TryGetValue(_currency, out var t) ? t : "nuban");
         _buyerPremiumPercent = PlatformFees.BuyerPremiumPercent(config);
 
         _http = http;
@@ -88,7 +101,8 @@ public class PaystackEscrowPaymentProvider : IEscrowPaymentProvider
     {
         if (string.IsNullOrWhiteSpace(escrow.SellerPayoutAccount))
             return PaymentResult.Fail(
-                "Seller has no Paystack transfer recipient; create one before payout.");
+                "The seller hasn't set up a payout account yet, so funds can't be released. " +
+                "The seller can add one under Payout settings on their profile.");
 
         // Transfer held funds from the platform balance to the seller's recipient.
         var resp = await _http.PostAsync("transfer",
@@ -103,6 +117,60 @@ public class PaystackEscrowPaymentProvider : IEscrowPaymentProvider
 
         var (ok, data, message) = await ReadEnvelope(resp, ct);
         return ok ? PaymentResult.Ok(RefOrNull(data), "released to seller") : PaymentResult.Fail(message);
+    }
+
+    public async Task<IReadOnlyList<PayoutBank>> ListPayoutBanksAsync(string currency, CancellationToken ct = default)
+    {
+        var cur = string.IsNullOrWhiteSpace(currency) ? _currency : currency;
+        var resp = await _http.GetAsync($"bank?currency={Uri.EscapeDataString(cur)}&perPage=100", ct);
+        var (ok, data, _) = await ReadEnvelope(resp, ct);
+        if (!ok || data.ValueKind != JsonValueKind.Array) return Array.Empty<PayoutBank>();
+
+        var banks = new List<PayoutBank>();
+        foreach (var b in data.EnumerateArray())
+        {
+            var name = b.TryGetProperty("name", out var n) ? n.GetString() : null;
+            var code = b.TryGetProperty("code", out var c) ? c.GetString() : null;
+            if (!string.IsNullOrWhiteSpace(name) && !string.IsNullOrWhiteSpace(code))
+                banks.Add(new PayoutBank(name, code));
+        }
+        return banks;
+    }
+
+    public async Task<RecipientResult> CreatePayoutRecipientAsync(PayoutRecipientRequest request, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(request.BankCode) || string.IsNullOrWhiteSpace(request.AccountNumber))
+            return RecipientResult.Fail("Bank and account number are required.");
+
+        var currency = string.IsNullOrWhiteSpace(request.Currency) ? _currency : request.Currency;
+        var resp = await _http.PostAsync("transferrecipient",
+            new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["type"] = _recipientType,
+                ["name"] = request.AccountName ?? request.AccountNumber,
+                ["account_number"] = request.AccountNumber,
+                ["bank_code"] = request.BankCode,
+                ["currency"] = currency,
+            }), ct);
+
+        var (ok, data, message) = await ReadEnvelope(resp, ct);
+        if (!ok) return RecipientResult.Fail(message);
+
+        var code = data.TryGetProperty("recipient_code", out var rc) ? rc.GetString() : null;
+        if (string.IsNullOrWhiteSpace(code))
+            return RecipientResult.Fail("Paystack did not return a recipient code.");
+
+        // Prefer Paystack's resolved account details for an accurate display.
+        string bankName = null, last4 = null;
+        if (data.TryGetProperty("details", out var det) && det.ValueKind == JsonValueKind.Object)
+        {
+            bankName = det.TryGetProperty("bank_name", out var bn) ? bn.GetString() : null;
+            var acct = det.TryGetProperty("account_number", out var an) ? an.GetString() : request.AccountNumber;
+            last4 = acct is { Length: >= 4 } ? acct[^4..] : acct;
+        }
+        last4 ??= request.AccountNumber is { Length: >= 4 } ? request.AccountNumber[^4..] : request.AccountNumber;
+
+        return RecipientResult.Ok(code, bankName, last4);
     }
 
     // Paystack wraps every response in { status: bool, message: string, data: {...} }.

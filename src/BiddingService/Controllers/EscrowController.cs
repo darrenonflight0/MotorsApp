@@ -174,6 +174,7 @@ public class EscrowController : ControllerBase
             return BadRequest($"Cannot release while escrow is {escrow.Status}");
         }
 
+        await ResolveSellerPayoutAccount(escrow);
         var payout = await _payments.ReleaseToSellerAsync(escrow);
         if (!payout.Success)
         {
@@ -235,6 +236,7 @@ public class EscrowController : ControllerBase
             return BadRequest($"Cannot resolve while escrow is {escrow.Status}");
         }
 
+        if (outcome == "release") await ResolveSellerPayoutAccount(escrow);
         var settlement = outcome == "release"
             ? await _payments.ReleaseToSellerAsync(escrow)
             : await _payments.RefundBuyerAsync(escrow);
@@ -258,4 +260,16 @@ public class EscrowController : ControllerBase
 
     private static Task<Escrow> FindEscrow(string auctionId) =>
         DB.Find<Escrow>().Match(e => e.AuctionId == auctionId).ExecuteFirstAsync();
+
+    // Populate the payout destination from the seller's registered payout method
+    // (set once, in Payouts). Real providers refuse to release without it; the
+    // simulated provider ignores it. Already-set accounts are left untouched.
+    private static async Task ResolveSellerPayoutAccount(Escrow escrow)
+    {
+        if (!string.IsNullOrWhiteSpace(escrow.SellerPayoutAccount)) return;
+        var method = await DB.Find<PayoutMethod>()
+            .Match(m => m.Seller == escrow.Seller)
+            .ExecuteFirstAsync();
+        if (method != null) escrow.SellerPayoutAccount = method.RecipientCode;
+    }
 }

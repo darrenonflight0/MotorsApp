@@ -72,7 +72,8 @@ public class StripeEscrowPaymentProvider : IEscrowPaymentProvider
     {
         if (string.IsNullOrWhiteSpace(escrow.SellerPayoutAccount))
             return PaymentResult.Fail(
-                "Seller has no connected Stripe account; complete Stripe Connect onboarding before payout.");
+                "The seller hasn't set up a payout account yet, so funds can't be released. " +
+                "The seller must complete payout onboarding first.");
 
         // Transfer held funds to the seller's connected account.
         var resp = await _http.PostAsync("v1/transfers",
@@ -86,6 +87,16 @@ public class StripeEscrowPaymentProvider : IEscrowPaymentProvider
 
         return await ToResult(resp, null, "released to seller", ct);
     }
+
+    // Stripe pays sellers through Stripe Connect onboarding (a hosted flow that
+    // yields a connected-account id), not a bank-account recipient list. The
+    // bank-form onboarding used by Paystack does not apply here.
+    public Task<IReadOnlyList<PayoutBank>> ListPayoutBanksAsync(string currency, CancellationToken ct = default) =>
+        Task.FromResult<IReadOnlyList<PayoutBank>>(Array.Empty<PayoutBank>());
+
+    public Task<RecipientResult> CreatePayoutRecipientAsync(PayoutRecipientRequest request, CancellationToken ct = default) =>
+        Task.FromResult(RecipientResult.Fail(
+            "Stripe payouts use Stripe Connect onboarding; a bank account cannot be registered directly here."));
 
     private async Task<PaymentResult> ToResult(HttpResponseMessage resp, string fallbackRef, string okMessage, CancellationToken ct)
     {
