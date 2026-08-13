@@ -37,8 +37,15 @@ builder.Services.AddMassTransit(x =>
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = builder.Configuration["IdentityServiceUrl"];
-        options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+        var authority = builder.Configuration["IdentityServiceUrl"];
+        options.Authority = authority;
+        // Service-to-identity traffic runs over Railway's private network on
+        // http, so only demand HTTPS for the metadata document when the authority
+        // is actually https. Forcing it on an http authority makes the JWT handler
+        // throw during construction — which surfaces as a 500 on EVERY request
+        // (the auth middleware runs even for anonymous endpoints).
+        options.RequireHttpsMetadata =
+            authority?.StartsWith("https", StringComparison.OrdinalIgnoreCase) ?? false;
         options.TokenValidationParameters.ValidateAudience = false;
         options.TokenValidationParameters.NameClaimType = "username";
         options.TokenValidationParameters.RoleClaimType = "role";
