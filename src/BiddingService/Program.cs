@@ -46,6 +46,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         // (the auth middleware runs even for anonymous endpoints).
         options.RequireHttpsMetadata =
             authority?.StartsWith("https", StringComparison.OrdinalIgnoreCase) ?? false;
+        // Keep JWT claim names as-is; the default mapping renames "role" to the
+        // long ClaimTypes.Role URI, breaking RoleClaimType="role" so admin-only
+        // endpoints (escrow resolve, admin lists) 403 for real admins.
+        options.MapInboundClaims = false;
         options.TokenValidationParameters.ValidateAudience = false;
         options.TokenValidationParameters.NameClaimType = "username";
         options.TokenValidationParameters.RoleClaimType = "role";

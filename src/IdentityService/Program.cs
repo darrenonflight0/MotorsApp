@@ -100,6 +100,10 @@ authBuilder.AddJwtBearer(options =>
 {
     options.Authority = builder.Configuration["IssuerUri"] ?? "http://localhost:5000";
     options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+    // Keep JWT claim names as-is. With the default inbound mapping, "role" is
+    // renamed to the long ClaimTypes.Role URI, so RoleClaimType="role" no longer
+    // matches and [Authorize(Roles="Admin")] returns 403 for genuine admins.
+    options.MapInboundClaims = false;
     options.TokenValidationParameters.ValidateAudience = false;
     options.TokenValidationParameters.NameClaimType = "username";
     options.TokenValidationParameters.RoleClaimType = "role";

@@ -13,6 +13,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     {
         options.Authority = builder.Configuration["IdentityServiceUrl"];
         options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+        // Don't remap inbound claims; the default map renames "role" to the long
+        // ClaimTypes.Role URI, which would break any role-based gateway policy.
+        options.MapInboundClaims = false;
         options.TokenValidationParameters.ValidateAudience = false;
         options.TokenValidationParameters.NameClaimType = "username";
         options.TokenValidationParameters.RoleClaimType = "role";
