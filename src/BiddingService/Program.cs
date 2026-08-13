@@ -56,6 +56,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddHostedService<CheckAuctionFinished>();
+builder.Services.AddHostedService<CheckEscrowFundingTimeout>();
 builder.Services.AddSingleton<BidLedger>();
 
 // Escrow payment provider. Defaults to the simulated provider; select a real

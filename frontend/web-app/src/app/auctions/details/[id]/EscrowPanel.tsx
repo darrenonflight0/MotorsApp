@@ -44,6 +44,11 @@ const statusCopy: Record<Escrow['status'], { label: string; cls: string; hint: s
     cls: 'bg-redline/10 text-redline',
     hint: 'An admin is reviewing this transaction. Funds stay locked meanwhile.',
   },
+  Defaulted: {
+    label: 'Defaulted',
+    cls: 'bg-redline/10 text-redline',
+    hint: 'The buyer did not pay within the funding window. The sale was cancelled and the bid deposit forfeited.',
+  },
 };
 
 export default function EscrowPanel({ auctionId, username }: Props) {

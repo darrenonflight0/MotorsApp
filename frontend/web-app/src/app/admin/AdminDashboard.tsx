@@ -17,6 +17,7 @@ const statusCls: Record<Escrow['status'], string> = {
   Released: 'bg-racing/10 text-racing',
   Refunded: 'bg-line/60 text-muted',
   Disputed: 'bg-redline/10 text-redline',
+  Defaulted: 'bg-redline/10 text-redline',
 };
 
 export default function AdminDashboard({ initialDisputed, initialAll }: Props) {

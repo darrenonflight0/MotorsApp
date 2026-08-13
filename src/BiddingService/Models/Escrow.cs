@@ -9,6 +9,10 @@ public enum EscrowStatus
     Released,
     Refunded,
     Disputed,
+    // Buyer failed to fund within the funding window; the sale is cancelled and
+    // any refundable bid deposit is forfeited. (New value appended so existing
+    // stored ordinals stay stable.)
+    Defaulted,
 }
 
 /// <summary>
