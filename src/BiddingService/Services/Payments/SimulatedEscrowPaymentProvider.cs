@@ -38,6 +38,20 @@ public class SimulatedEscrowPaymentProvider : IEscrowPaymentProvider
         return Task.FromResult(PaymentResult.Ok($"sim_ref_{Guid.NewGuid():N}", "simulated refund to buyer"));
     }
 
+    public Task<PaymentResult> VerifyPaymentAsync(int amount, string paymentReference, CancellationToken ct = default)
+    {
+        _logger.LogInformation("PAYMENT simulated_verify amount={Amount}", amount);
+        return Task.FromResult(PaymentResult.Ok(
+            string.IsNullOrWhiteSpace(paymentReference) ? $"sim_pay_{Guid.NewGuid():N}" : paymentReference,
+            "simulated payment verified"));
+    }
+
+    public Task<PaymentResult> RefundPaymentAsync(string paymentReference, CancellationToken ct = default)
+    {
+        _logger.LogInformation("PAYMENT simulated_refund_payment ref={Ref}", paymentReference);
+        return Task.FromResult(PaymentResult.Ok($"sim_ref_{Guid.NewGuid():N}", "simulated payment refunded"));
+    }
+
     public Task<IReadOnlyList<PayoutBank>> ListPayoutBanksAsync(string currency, CancellationToken ct = default)
     {
         IReadOnlyList<PayoutBank> banks = new[]

@@ -27,6 +27,15 @@ public interface IEscrowPaymentProvider
     Task<PaymentResult> RefundBuyerAsync(Escrow escrow, CancellationToken ct = default);
 
     /// <summary>
+    /// Confirm a standalone payment of <paramref name="amount"/> succeeded
+    /// (e.g. a refundable bid deposit), returning its provider reference.
+    /// </summary>
+    Task<PaymentResult> VerifyPaymentAsync(int amount, string paymentReference, CancellationToken ct = default);
+
+    /// <summary>Refund a previously captured standalone payment by its reference.</summary>
+    Task<PaymentResult> RefundPaymentAsync(string paymentReference, CancellationToken ct = default);
+
+    /// <summary>
     /// Banks the seller can be paid out to, for the given settlement currency.
     /// Empty when the provider onboards payouts a different way (e.g. Stripe
     /// Connect hosted onboarding).

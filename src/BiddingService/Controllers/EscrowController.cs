@@ -150,6 +150,10 @@ public class EscrowController : ControllerBase
         escrow.Audit(Username, $"buyer deposited funds via {_payments.Name} (ref {payment.ProviderReference})");
         await DB.SaveAsync(escrow);
 
+        // The winner has paid the full amount into escrow, so their refundable
+        // bid deposit is no longer needed — return it.
+        await RefundBidDeposit(auctionId, escrow.Buyer);
+
         _logger.LogInformation("SECURITY escrow_funded auction={Auction} buyer={Buyer} amount={Amount} provider={Provider}",
             auctionId, Username, escrow.Amount, _payments.Name);
         return Ok(ToDto(escrow));
@@ -271,5 +275,22 @@ public class EscrowController : ControllerBase
             .Match(m => m.Seller == escrow.Seller)
             .ExecuteFirstAsync();
         if (method != null) escrow.SellerPayoutAccount = method.RecipientCode;
+    }
+
+    // Return a bidder's held refundable bid deposit for an auction (no-op if none).
+    private async Task RefundBidDeposit(string auctionId, string bidder)
+    {
+        var deposit = await DB.Find<BidDeposit>()
+            .Match(d => d.AuctionId == auctionId && d.Bidder == bidder && d.Status == BidDepositStatus.Held)
+            .ExecuteFirstAsync();
+        if (deposit == null) return;
+
+        var refund = await _payments.RefundPaymentAsync(deposit.PaymentReference);
+        deposit.Status = BidDepositStatus.Refunded;
+        deposit.RefundReference = refund.ProviderReference;
+        deposit.ClosedAt = DateTime.UtcNow;
+        await DB.SaveAsync(deposit);
+        _logger.LogInformation("SECURITY bid_deposit_refunded_on_funding auction={Auction} bidder={Bidder} ok={Ok}",
+            auctionId, bidder, refund.Success);
     }
 }

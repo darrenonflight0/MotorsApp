@@ -43,6 +43,7 @@ public class CheckAuctionFinished : BackgroundService
 
         using var scope = _services.CreateScope();
         var endpoint = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
+        var payments = scope.ServiceProvider.GetRequiredService<Payments.IEscrowPaymentProvider>();
 
         foreach (var auction in finishedAuctions)
         {
@@ -79,6 +80,25 @@ public class CheckAuctionFinished : BackgroundService
                         "SECURITY escrow_created auction={Auction} buyer={Buyer} seller={Seller} amount={Amount}",
                         auction.ID, winningBid.Bidder, auction.Seller, winningBid.Amount);
                 }
+            }
+
+            // Return refundable bid deposits to everyone except the winner (whose
+            // deposit stays held against their obligation to fund the escrow).
+            var winner = winningBid?.Bidder;
+            var deposits = await DB.Find<BidDeposit>()
+                .Match(d => d.AuctionId == auction.ID && d.Status == BidDepositStatus.Held)
+                .ExecuteAsync(stoppingToken);
+            foreach (var dep in deposits)
+            {
+                if (dep.Bidder == winner) continue;
+                var refund = await payments.RefundPaymentAsync(dep.PaymentReference, stoppingToken);
+                dep.Status = BidDepositStatus.Refunded;
+                dep.RefundReference = refund.ProviderReference;
+                dep.ClosedAt = DateTime.UtcNow;
+                await DB.SaveAsync(dep, null, stoppingToken);
+                _logger.LogInformation(
+                    "SECURITY bid_deposit_refunded auction={Auction} bidder={Bidder} ok={Ok}",
+                    auction.ID, dep.Bidder, refund.Success);
             }
 
             await endpoint.Publish(new AuctionFinished

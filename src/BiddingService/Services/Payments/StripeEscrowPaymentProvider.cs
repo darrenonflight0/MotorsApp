@@ -88,6 +88,35 @@ public class StripeEscrowPaymentProvider : IEscrowPaymentProvider
         return await ToResult(resp, null, "released to seller", ct);
     }
 
+    public async Task<PaymentResult> VerifyPaymentAsync(int amount, string paymentReference, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(paymentReference))
+            return PaymentResult.Fail("A Stripe PaymentIntent id is required.");
+
+        var resp = await _http.PostAsync(
+            $"v1/payment_intents/{paymentReference}/capture",
+            new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["amount_to_capture"] = MinorUnits(amount).ToString(),
+            }), ct);
+
+        return await ToResult(resp, paymentReference, "payment verified", ct);
+    }
+
+    public async Task<PaymentResult> RefundPaymentAsync(string paymentReference, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(paymentReference))
+            return PaymentResult.Fail("No payment reference to refund.");
+
+        var resp = await _http.PostAsync("v1/refunds",
+            new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["payment_intent"] = paymentReference,
+            }), ct);
+
+        return await ToResult(resp, null, "payment refunded", ct);
+    }
+
     // Stripe pays sellers through Stripe Connect onboarding (a hosted flow that
     // yields a connected-account id), not a bank-account recipient list. The
     // bank-form onboarding used by Paystack does not apply here.

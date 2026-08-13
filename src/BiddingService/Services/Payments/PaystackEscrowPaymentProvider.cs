@@ -119,6 +119,40 @@ public class PaystackEscrowPaymentProvider : IEscrowPaymentProvider
         return ok ? PaymentResult.Ok(RefOrNull(data), "released to seller") : PaymentResult.Fail(message);
     }
 
+    public async Task<PaymentResult> VerifyPaymentAsync(int amount, string paymentReference, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(paymentReference))
+            return PaymentResult.Fail("A Paystack transaction reference is required.");
+
+        var resp = await _http.GetAsync($"transaction/verify/{Uri.EscapeDataString(paymentReference)}", ct);
+        var (ok, data, message) = await ReadEnvelope(resp, ct);
+        if (!ok) return PaymentResult.Fail(message);
+
+        var txStatus = data.TryGetProperty("status", out var s) ? s.GetString() : null;
+        var paid = data.TryGetProperty("amount", out var a) && a.TryGetInt64(out var amt) ? amt : 0;
+        if (txStatus != "success")
+            return PaymentResult.Fail($"Paystack transaction not successful (status={txStatus}).");
+        if (paid < MinorUnits(amount))
+            return PaymentResult.Fail("Paystack transaction amount is less than the required deposit.");
+
+        return PaymentResult.Ok(paymentReference, "payment verified");
+    }
+
+    public async Task<PaymentResult> RefundPaymentAsync(string paymentReference, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(paymentReference))
+            return PaymentResult.Fail("No payment reference to refund.");
+
+        var resp = await _http.PostAsync("refund",
+            new FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["transaction"] = paymentReference,
+            }), ct);
+
+        var (ok, data, message) = await ReadEnvelope(resp, ct);
+        return ok ? PaymentResult.Ok(RefOrNull(data), "payment refunded") : PaymentResult.Fail(message);
+    }
+
     public async Task<IReadOnlyList<PayoutBank>> ListPayoutBanksAsync(string currency, CancellationToken ct = default)
     {
         var cur = string.IsNullOrWhiteSpace(currency) ? _currency : currency;

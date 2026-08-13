@@ -29,15 +29,18 @@ public class BidsController : ControllerBase
     private readonly IPublishEndpoint _publishEndpoint;
     private readonly BidLedger _ledger;
     private readonly AuctionServiceHttpClient _auctionClient;
+    private readonly IConfiguration _config;
     private readonly ILogger<BidsController> _logger;
 
     public BidsController(IMapper mapper, IPublishEndpoint publishEndpoint,
-        BidLedger ledger, AuctionServiceHttpClient auctionClient, ILogger<BidsController> logger)
+        BidLedger ledger, AuctionServiceHttpClient auctionClient, IConfiguration config,
+        ILogger<BidsController> logger)
     {
         _mapper = mapper;
         _publishEndpoint = publishEndpoint;
         _ledger = ledger;
         _auctionClient = auctionClient;
+        _config = config;
         _logger = logger;
     }
 
@@ -77,6 +80,31 @@ public class BidsController : ControllerBase
                 _logger.LogWarning("SECURITY bid_rejected_own_auction user={User} auction={Auction}",
                     User.Identity.Name, auctionId);
                 return BadRequest("You cannot bid on your own auction");
+            }
+
+            // Bid-deposit gate: a bidder must have a paid, refundable deposit for
+            // this lot before any bid is accepted, so fake bidders with no means
+            // (or intent) to pay can't inflate or ghost the auction.
+            if (BidDepositPolicy.Enabled(_config))
+            {
+                var requiredDeposit = BidDepositPolicy.RequiredAmount(_config, auction.ReservePrice);
+                if (requiredDeposit > 0)
+                {
+                    var held = await DB.Find<BidDeposit>()
+                        .Match(d => d.AuctionId == auctionId && d.Bidder == User.Identity.Name
+                            && d.Status == BidDepositStatus.Held)
+                        .ExecuteFirstAsync();
+                    if (held == null)
+                    {
+                        _logger.LogWarning("SECURITY bid_rejected_no_deposit user={User} auction={Auction}",
+                            User.Identity.Name, auctionId);
+                        return StatusCode(StatusCodes.Status402PaymentRequired, new
+                        {
+                            error = $"A refundable bid deposit of {requiredDeposit} is required before you can bid on this lot.",
+                            requiredDeposit,
+                        });
+                    }
+                }
             }
 
             var bid = new Bid

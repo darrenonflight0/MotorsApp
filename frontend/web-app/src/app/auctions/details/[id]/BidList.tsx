@@ -10,6 +10,7 @@ import { useShallow } from 'zustand/react/shallow';
 import toast from 'react-hot-toast';
 import BidItem from './BidItem';
 import BidForm from './BidForm';
+import BidDepositGate from './BidDepositGate';
 import Heading from '@/app/components/Heading';
 
 type Props = {
@@ -86,7 +87,11 @@ export default function BidList({ user, auction }: Props) {
         ) : user.username === auction.seller ? (
           <span className="text-sm text-muted">You cannot bid on your own auction</span>
         ) : (
-          canBid && <BidForm auctionId={auction.id} highBid={highBid} />
+          canBid && (
+            <BidDepositGate auctionId={auction.id} username={user?.username}>
+              <BidForm auctionId={auction.id} highBid={highBid} />
+            </BidDepositGate>
+          )
         )}
       </div>
     </div>
