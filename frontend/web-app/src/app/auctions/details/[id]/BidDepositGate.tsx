@@ -1,7 +1,7 @@
 'use client';
 
 import { getBidDeposit, placeBidDeposit, BidDeposit } from '@/app/actions/bidDepositActions';
-import { numberWithCommas } from '@/lib/format';
+import { money } from '@/lib/format';
 import { ReactNode, useCallback, useEffect, useState } from 'react';
 import Script from 'next/script';
 import toast from 'react-hot-toast';
@@ -87,7 +87,7 @@ export default function BidDepositGate({ auctionId, username, children }: Props)
       <span className="eyebrow">Refundable bid deposit</span>
       <p className="mt-1 text-sm text-muted">
         To bid on this lot, place a fully refundable deposit of{' '}
-        <span className="readout font-bold text-fg">${numberWithCommas(deposit.amount)}</span>. It&apos;s
+        <span className="readout font-bold text-fg">{money(deposit.amount)}</span>. It&apos;s
         returned automatically if you don&apos;t win, or when you pay for the car after winning. This keeps
         bidding fair by stopping bids from people who can&apos;t pay.
       </p>
@@ -101,7 +101,7 @@ export default function BidDepositGate({ auctionId, username, children }: Props)
           ? 'Confirming…'
           : usesPaystack
             ? `Deposit ${CURRENCY} ${deposit.amount.toLocaleString()} with Paystack`
-            : `Place $${numberWithCommas(deposit.amount)} deposit`}
+            : `Place ${money(deposit.amount)} deposit`}
       </button>
       {usesPaystack && (
         <span className="mt-1 block text-xs text-muted">
