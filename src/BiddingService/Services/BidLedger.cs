@@ -19,36 +19,57 @@ public class BidLedger
     {
         _rsa = RSA.Create(2048);
 
-        // Key material may be injected directly (BidLedger:KeyPem — ideal for
-        // container secrets / key vaults) or loaded from a file path. Auto-
-        // generating a throwaway key is a development-only convenience: in
-        // production every instance would otherwise sign with a different key,
-        // making signatures unverifiable across the fleet and after a restart.
+        // 1. An explicitly configured key (env var or file) takes precedence — but
+        //    a malformed value must NEVER take the whole bidding service down. A
+        //    bad PEM here used to throw and 500 every bid endpoint; instead we log
+        //    it and fall through to the persisted key below.
         var inlinePem = config["BidLedger:KeyPem"];
         var keyPath = config["BidLedger:KeyPath"] ?? "bid-ledger-rsa.pem";
 
         if (!string.IsNullOrWhiteSpace(inlinePem))
         {
-            // Some hosts (Railway, Heroku, etc.) can't hold multi-line env vars,
-            // so accept a single-line PEM with literal "\n" escapes too.
-            _rsa.ImportFromPem(inlinePem.Replace("\\n", "\n"));
-            logger.LogInformation("SECURITY bid_ledger_key_loaded source=config");
+            // Accept both multi-line PEM and single-line with literal "\n" escapes
+            // (some hosts mangle multi-line env vars).
+            if (TryImport(inlinePem.Replace("\\n", "\n").Trim(), "config", logger)) return;
         }
         else if (File.Exists(keyPath))
         {
-            _rsa.ImportFromPem(File.ReadAllText(keyPath));
-            logger.LogInformation("SECURITY bid_ledger_key_loaded path={Path}", keyPath);
+            if (TryImport(File.ReadAllText(keyPath), $"path {keyPath}", logger)) return;
         }
-        else if (env.IsDevelopment())
+
+        // 2. Persisted key in the BiddingService's Mongo database: stable across
+        //    redeploys and restarts with nothing to hand-carry. Generated once and
+        //    reused thereafter so signatures stay verifiable over time.
+        var stored = DB.Find<LedgerKey>()
+            .Match(f => f.Empty)
+            .ExecuteFirstAsync().GetAwaiter().GetResult();
+        if (stored != null && !string.IsNullOrWhiteSpace(stored.PrivateKeyPem)
+            && TryImport(stored.PrivateKeyPem, "mongo", logger))
         {
-            File.WriteAllText(keyPath, _rsa.ExportRSAPrivateKeyPem());
-            logger.LogWarning("SECURITY bid_ledger_key_generated path={Path}", keyPath);
+            return;
         }
-        else
+
+        // 3. First run anywhere with no usable key: generate one and persist it so
+        //    every later start reuses it.
+        var generatedPem = _rsa.ExportPkcs8PrivateKeyPem();
+        DB.SaveAsync(new LedgerKey { PrivateKeyPem = generatedPem }).GetAwaiter().GetResult();
+        logger.LogWarning("SECURITY bid_ledger_key_generated source=mongo");
+    }
+
+    // Import a PEM into _rsa; returns false (and logs) instead of throwing so the
+    // caller can fall back to another key source rather than crashing requests.
+    private bool TryImport(string pem, string source, ILogger<BidLedger> logger)
+    {
+        try
         {
-            throw new InvalidOperationException(
-                "No bid-ledger signing key configured (set BidLedger:KeyPem or BidLedger:KeyPath). " +
-                "Refusing to start in production with an ephemeral per-instance key.");
+            _rsa.ImportFromPem(pem);
+            logger.LogInformation("SECURITY bid_ledger_key_loaded source={Source}", source);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "SECURITY bid_ledger_key_invalid source={Source}; falling back", source);
+            return false;
         }
     }
 
