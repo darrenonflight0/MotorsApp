@@ -80,6 +80,19 @@ const brands: Brand[] = [
   { name: 'Mazda MX-30', slug: 'mazda', ev: true },
 ];
 
+// Slugs actually present in Simple Icons today. Many car marques have been
+// removed from the set for trademark reasons, and requesting a missing one 404s
+// (harmless, but it spams the console). Brands not listed here render a clean
+// monogram instead of firing a doomed request; listed ones still fall back to the
+// monogram via onError if the icon is ever pulled.
+const LOGO_SLUGS = new Set([
+  'toyota', 'ford', 'bmw', 'audi', 'volkswagen', 'porsche', 'ferrari', 'lamborghini',
+  'honda', 'nissan', 'mazda', 'subaru', 'mitsubishi', 'suzuki', 'tesla', 'hyundai',
+  'kia', 'volvo', 'bentley', 'rollsroyce', 'astonmartin', 'maserati', 'bugatti',
+  'chevrolet', 'jeep', 'cadillac', 'peugeot', 'renault', 'citroen', 'fiat', 'mini',
+  'skoda', 'xiaomi', 'mg',
+]);
+
 function BrandTile({
   name,
   slug,
@@ -93,7 +106,9 @@ function BrandTile({
   active: boolean;
   onPick: () => void;
 }) {
-  const [logoOk, setLogoOk] = useState(true);
+  // Start with the logo only if the icon actually exists; otherwise go straight
+  // to the monogram so no doomed request is ever made.
+  const [logoOk, setLogoOk] = useState(() => LOGO_SLUGS.has(slug));
 
   return (
     <button
