@@ -6,6 +6,7 @@ import { useBidStore } from '@/hooks/useBidStore';
 import { useNotificationStore } from '@/hooks/useNotificationStore';
 import { Auction, AuctionFinished, Bid } from '@/types';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
+import { useSession } from 'next-auth/react';
 import { ReactNode, useEffect, useRef } from 'react';
 import toast from 'react-hot-toast';
 
@@ -18,6 +19,11 @@ type Props = {
 
 export default function SignalRProvider({ children }: Props) {
   const connection = useRef<HubConnection | null>(null);
+  const { data: session } = useSession();
+  // Kept in a ref so the SignalR handlers always read the latest username
+  // without re-subscribing on every session change.
+  const usernameRef = useRef<string | undefined>(undefined);
+  usernameRef.current = session?.user?.username;
   const setCurrentPrice = useAuctionStore((state) => state.setCurrentPrice);
   const addBid = useBidStore((state) => state.addBid);
   const addNotification = useNotificationStore((state) => state.add);
@@ -80,11 +86,26 @@ export default function SignalRProvider({ children }: Props) {
       toast(finished.itemSold ? 'An auction has finished with a sale' : 'An auction has finished');
     });
 
+    connection.current.on(
+      'SecondChanceOffered',
+      (offer: { auctionId: string; buyer: string; amount: number }) => {
+        // Only the offered bidder should hear about it.
+        if (!offer.buyer || offer.buyer !== usernameRef.current) return;
+        addNotification({
+          type: 'SecondChance',
+          message: `Second chance: buy this lot for $${offer.amount}`,
+          href: `/auctions/details/${offer.auctionId}`,
+        });
+        toast.success(`You've been offered a second chance to buy a lot for $${offer.amount}`);
+      }
+    );
+
     return () => {
       connection.current?.off('BidPlaced');
       connection.current?.off('AuctionCreated');
       connection.current?.off('AuctionEndExtended');
       connection.current?.off('AuctionFinished');
+      connection.current?.off('SecondChanceOffered');
     };
   }, [setCurrentPrice, addBid, addNotification, pushActivity]);
 

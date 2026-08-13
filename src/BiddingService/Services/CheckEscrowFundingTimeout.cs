@@ -133,6 +133,14 @@ public class CheckEscrowFundingTimeout : BackgroundService
             };
             secondChance.Audit("system", $"second-chance offer after {escrow.Buyer} defaulted");
             await DB.SaveAsync(secondChance, null, ct);
+
+            await publishEndpoint.Publish(new SecondChanceOffered
+            {
+                AuctionId = escrow.AuctionId,
+                Buyer = next.Bidder,
+                Seller = escrow.Seller,
+                Amount = next.Amount,
+            }, ct);
             _logger.LogInformation(
                 "SECURITY escrow_second_chance auction={Auction} newBuyer={Buyer} amount={Amount}",
                 escrow.AuctionId, next.Bidder, next.Amount);
