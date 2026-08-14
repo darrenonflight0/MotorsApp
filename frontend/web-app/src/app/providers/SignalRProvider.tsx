@@ -4,6 +4,7 @@ import { useActivityStore } from '@/hooks/useActivityStore';
 import { useAuctionStore } from '@/hooks/useAuctionStore';
 import { useBidStore } from '@/hooks/useBidStore';
 import { useNotificationStore } from '@/hooks/useNotificationStore';
+import { playRev, primeRevSound } from '@/lib/revSound';
 import { Auction, AuctionFinished, Bid } from '@/types';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import { useSession } from 'next-auth/react';
@@ -61,6 +62,7 @@ export default function SignalRProvider({ children }: Props) {
         href: `/auctions/details/${auction.id}`,
       });
       toast(`New auction: ${auction.make} ${auction.model}`);
+      playRev();
     });
 
     connection.current.on(
@@ -84,6 +86,7 @@ export default function SignalRProvider({ children }: Props) {
         href: `/auctions/details/${finished.auctionId}`,
       });
       toast(finished.itemSold ? 'An auction has finished with a sale' : 'An auction has finished');
+      playRev();
     });
 
     connection.current.on(
@@ -97,6 +100,20 @@ export default function SignalRProvider({ children }: Props) {
           href: `/auctions/details/${offer.auctionId}`,
         });
         toast.success(`You've been offered a second chance to buy a lot for $${offer.amount}`);
+        playRev();
+      }
+    );
+
+    connection.current.on(
+      'Announcement',
+      (a: { title?: string; message: string; href?: string }) => {
+        addNotification({
+          type: 'Announcement',
+          message: a.title ? `${a.title}: ${a.message}` : a.message,
+          href: a.href || '/',
+        });
+        toast(a.message, { icon: '📣', duration: 6000 });
+        playRev();
       }
     );
 
@@ -106,8 +123,21 @@ export default function SignalRProvider({ children }: Props) {
       connection.current?.off('AuctionEndExtended');
       connection.current?.off('AuctionFinished');
       connection.current?.off('SecondChanceOffered');
+      connection.current?.off('Announcement');
     };
   }, [setCurrentPrice, addBid, addNotification, pushActivity]);
+
+  // Audio can't play until the user has interacted with the page, so resume the
+  // rev-sound audio context on the first gesture.
+  useEffect(() => {
+    const prime = () => primeRevSound();
+    window.addEventListener('pointerdown', prime, { once: true });
+    window.addEventListener('keydown', prime, { once: true });
+    return () => {
+      window.removeEventListener('pointerdown', prime);
+      window.removeEventListener('keydown', prime);
+    };
+  }, []);
 
   return children;
 }

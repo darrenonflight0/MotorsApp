@@ -89,9 +89,11 @@ export default function UserActions({ user }: Props) {
                 <HiBadgeCheck className="mr-2 inline" /> Get verified to sell
               </Link>
             )}
-            <Link href="/session" onClick={() => setOpen(false)} className="dropdown-item block">
-              <HiUser className="mr-2 inline" /> Session (dev)
-            </Link>
+            {isAdmin && (
+              <Link href="/session" onClick={() => setOpen(false)} className="dropdown-item block">
+                <HiUser className="mr-2 inline" /> Session (dev)
+              </Link>
+            )}
             <div className="my-1 border-t border-line/70" />
             <button
               onClick={() => signOut({ callbackUrl: '/' })}

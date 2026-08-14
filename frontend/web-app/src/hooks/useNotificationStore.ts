@@ -2,7 +2,7 @@ import { create } from 'zustand';
 
 export type Notification = {
   id: string;
-  type: 'AuctionCreated' | 'BidPlaced' | 'AuctionFinished' | 'AuctionExtended' | 'SecondChance';
+  type: 'AuctionCreated' | 'BidPlaced' | 'AuctionFinished' | 'AuctionExtended' | 'SecondChance' | 'Announcement';
   message: string;
   href?: string;
   createdAt: number;

@@ -5,6 +5,7 @@ import { getPendingApplications, ReviewApplication } from '@/app/actions/verific
 import PageHero from '@/app/components/PageHero';
 import { Escrow } from '@/types';
 import Link from 'next/link';
+import AdminAnnounce from './AdminAnnounce';
 import AdminDashboard from './AdminDashboard';
 import AdminRoles from './AdminRoles';
 import SellerApplications from './SellerApplications';
@@ -64,6 +65,7 @@ export default async function AdminPage() {
           subtitle="Approve auctioneers and oversee escrow settlements and disputes."
         />
       </div>
+      <AdminAnnounce />
       <SellerApplications initial={apps} />
       <AdminRoles initial={adminUsers} />
       <AdminDashboard initialDisputed={asArray(disputed)} initialAll={asArray(all)} />
