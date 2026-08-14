@@ -70,6 +70,25 @@ export async function rejectApplication(id: string, reason: string): Promise<App
   return await fetchWrapper.post(`verification/admin/${id}/reject`, { reason });
 }
 
+export type VerifiedUser = {
+  username: string;
+  verified: boolean;
+  profilePicture?: string | null;
+};
+
+/** Admin: list verified (authorised) users, optionally filtered by username. */
+export async function getVerifiedUsers(q = ''): Promise<VerifiedUser[]> {
+  const res = await fetchWrapper.get(`verification/admin/verified?q=${encodeURIComponent(q)}`);
+  return Array.isArray(res) ? res : [];
+}
+
+/** Admin: revoke a user's seller authorisation. */
+export async function revokeVerification(
+  username: string
+): Promise<{ username: string; verified: boolean } | Err> {
+  return await fetchWrapper.post(`verification/admin/${encodeURIComponent(username)}/revoke`, {});
+}
+
 // ── Profiles (blue tick lookup) ──
 export async function getPublicProfile(username: string): Promise<PublicProfile | Err> {
   return await fetchWrapper.get(`profile/${encodeURIComponent(username)}`);

@@ -170,6 +170,57 @@ public class VerificationController : ControllerBase
         return Ok(ToStatusDto(application));
     }
 
+    /// <summary>Admin: list verified (authorised) users, optionally filtered by username.</summary>
+    [Authorize(Roles = "Admin", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpGet("admin/verified")]
+    public async Task<IActionResult> VerifiedUsers([FromQuery] string q = null)
+    {
+        var query = _userManager.Users.Where(u => u.IsVerified);
+        if (!string.IsNullOrWhiteSpace(q))
+        {
+            var term = q.Trim();
+            query = query.Where(u => u.UserName.Contains(term));
+        }
+
+        var users = await query.OrderBy(u => u.UserName).Take(50).ToListAsync();
+        return Ok(users.Select(u => new
+        {
+            username = u.UserName,
+            verified = u.IsVerified,
+            profilePicture = u.ProfilePicture,
+        }));
+    }
+
+    /// <summary>Admin: revoke a user's seller authorisation (un-verify them).</summary>
+    [Authorize(Roles = "Admin", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [HttpPost("admin/{username}/revoke")]
+    public async Task<IActionResult> Revoke(string username)
+    {
+        var user = await _userManager.FindByNameAsync(username);
+        if (user == null) return NotFound();
+        if (!user.IsVerified) return BadRequest(new { error = "That user is not verified." });
+
+        user.IsVerified = false;
+        await _userManager.UpdateAsync(user);
+
+        // Mark their approved application as rejected so a re-application starts clean.
+        var approved = await _db.SellerApplications
+            .Where(a => a.Username == username && a.Status == SellerApplicationStatus.Approved)
+            .OrderByDescending(a => a.SubmittedAt)
+            .FirstOrDefaultAsync();
+        if (approved != null)
+        {
+            approved.Status = SellerApplicationStatus.Rejected;
+            approved.ReviewedAt = DateTime.UtcNow;
+            approved.ReviewedBy = Username;
+            approved.RejectionReason = "Authorisation revoked by admin.";
+            await _db.SaveChangesAsync();
+        }
+
+        _logger.LogWarning("SECURITY seller_verification_revoked user={User} admin={Admin}", username, Username);
+        return Ok(new { username, verified = false });
+    }
+
     private static bool IsImageDataUri(string s) =>
         !string.IsNullOrEmpty(s) && s.StartsWith("data:image/", StringComparison.OrdinalIgnoreCase);
 }
