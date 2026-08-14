@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Contracts;
+using System.Text.Json;
 
 namespace AuctionService.Controllers;
 
@@ -18,13 +19,38 @@ public class AuctionsController : ControllerBase
     private readonly AuctionDbContext _context;
     private readonly IMapper _mapper;
     private readonly IPublishEndpoint _publishEndpoint;
+    private readonly IHttpClientFactory _httpFactory;
+    private readonly ILogger<AuctionsController> _logger;
 
     public AuctionsController(AuctionDbContext context, IMapper mapper,
-        IPublishEndpoint publishEndpoint)
+        IPublishEndpoint publishEndpoint, IHttpClientFactory httpFactory,
+        ILogger<AuctionsController> logger)
     {
         _context = context;
         _mapper = mapper;
         _publishEndpoint = publishEndpoint;
+        _httpFactory = httpFactory;
+        _logger = logger;
+    }
+
+    // Checks the seller's LIVE verification status against the IdentityService,
+    // so an admin's revocation takes effect immediately rather than waiting for
+    // the seller's token (which carries a stale `verified` claim) to refresh.
+    private async Task<bool> IsVerifiedSellerAsync(string username)
+    {
+        try
+        {
+            var client = _httpFactory.CreateClient("identity");
+            var resp = await client.GetAsync($"api/profile/{Uri.EscapeDataString(username)}");
+            if (!resp.IsSuccessStatusCode) return false; // fail closed
+            using var doc = JsonDocument.Parse(await resp.Content.ReadAsStringAsync());
+            return doc.RootElement.TryGetProperty("verified", out var v) && v.ValueKind == JsonValueKind.True;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "verified_check_failed user={User}", username);
+            return false; // fail closed: no verification confirmation → not allowed to sell
+        }
     }
 
     [HttpGet]
@@ -56,6 +82,16 @@ public class AuctionsController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<AuctionDto>> CreateAuction(CreateAuctionDto auctionDto)
     {
+        // Only currently-verified sellers may list a car. Checked live so a
+        // revoked authorisation blocks new listings immediately.
+        var seller = User.Identity?.Name;
+        if (string.IsNullOrEmpty(seller) || !await IsVerifiedSellerAsync(seller))
+        {
+            _logger.LogWarning("SECURITY listing_denied_unverified user={User}", seller);
+            return StatusCode(StatusCodes.Status403Forbidden,
+                "You must be a verified seller to list a car.");
+        }
+
         // Deny-by-default input validation.
         if (auctionDto.AuctionEnd <= DateTime.UtcNow.AddMinutes(5))
         {

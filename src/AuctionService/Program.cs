@@ -47,14 +47,27 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+var identityUrl = builder.Configuration["IdentityServiceUrl"];
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.Authority = builder.Configuration["IdentityServiceUrl"];
-        options.RequireHttpsMetadata = !builder.Environment.IsDevelopment();
+        options.Authority = identityUrl;
+        // Only require HTTPS metadata when the authority is actually https, so an
+        // internal http identity URL doesn't make the JWT handler throw.
+        options.RequireHttpsMetadata = identityUrl?.StartsWith("https", StringComparison.OrdinalIgnoreCase) ?? false;
+        options.MapInboundClaims = false;
         options.TokenValidationParameters.ValidateAudience = false;
         options.TokenValidationParameters.NameClaimType = "username";
+        options.TokenValidationParameters.RoleClaimType = "role";
     });
+
+// Used to check a seller's live verification status at listing time.
+builder.Services.AddHttpClient("identity", client =>
+{
+    var baseUrl = identityUrl ?? "http://localhost:5000";
+    client.BaseAddress = new Uri(baseUrl.TrimEnd('/') + "/");
+});
 
 
 var app = builder.Build();
