@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using IdentityService.Data;
 using IdentityService.Models;
+using IdentityService.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -16,6 +17,7 @@ public class VerificationController : ControllerBase
 {
     private readonly ApplicationDbContext _db;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly DataEncryptor _enc;
     private readonly ILogger<VerificationController> _logger;
 
     // Data URIs are capped so a captured photo can't bloat the request. The
@@ -23,10 +25,12 @@ public class VerificationController : ControllerBase
     private const int MaxImageChars = 3_000_000; // ~2 MB encoded
 
     public VerificationController(ApplicationDbContext db,
-        UserManager<ApplicationUser> userManager, ILogger<VerificationController> logger)
+        UserManager<ApplicationUser> userManager, DataEncryptor enc,
+        ILogger<VerificationController> logger)
     {
         _db = db;
         _userManager = userManager;
+        _enc = enc;
         _logger = logger;
     }
 
@@ -46,15 +50,16 @@ public class VerificationController : ControllerBase
         rejectionReason = a.RejectionReason,
     };
 
-    private static object ToReviewDto(SellerApplication a) => new
+    // Decrypts the stored images so the admin can view them during review.
+    private object ToReviewDto(SellerApplication a) => new
     {
         id = a.Id,
         username = a.Username,
         idType = a.IdType,
         status = a.Status.ToString(),
         submittedAt = a.SubmittedAt,
-        selfieImage = a.SelfieImage,
-        idImage = a.IdImage,
+        selfieImage = _enc.Decrypt(a.SelfieImage),
+        idImage = _enc.Decrypt(a.IdImage),
     };
 
     /// <summary>Submit a seller-verification application (live selfie + ID photo).</summary>
@@ -80,8 +85,9 @@ public class VerificationController : ControllerBase
         {
             Username = Username,
             IdType = dto.IdType,
-            SelfieImage = dto.SelfieImage,
-            IdImage = dto.IdImage,
+            // Encrypted at rest — decrypted only when an admin reviews.
+            SelfieImage = _enc.Encrypt(dto.SelfieImage),
+            IdImage = _enc.Encrypt(dto.IdImage),
         };
         _db.SellerApplications.Add(application);
         await _db.SaveChangesAsync();

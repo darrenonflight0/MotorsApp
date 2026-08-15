@@ -40,6 +40,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
 // BCrypt (work factor 12) with transparent migration off legacy PBKDF2 hashes.
 builder.Services.AddScoped<IPasswordHasher<ApplicationUser>, BCryptPasswordHasher>();
 builder.Services.AddScoped<IAppEmailSender, EmailSender>();
+builder.Services.AddSingleton<DataEncryptor>();
 
 var idsvcBuilder = builder.Services.AddIdentityServer(options =>
 {
