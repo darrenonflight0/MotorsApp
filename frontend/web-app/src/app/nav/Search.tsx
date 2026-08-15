@@ -73,7 +73,7 @@ export default function Search() {
       return goToSeller(q.replace(/^@+/, ''));
     }
     if (pathname !== '/') router.push('/');
-    setParams({ searchTerm: searchValue });
+    setParams({ searchTerm: searchValue, vehicleType: '' });
   }
 
   function onKeyDown(e: React.KeyboardEvent) {

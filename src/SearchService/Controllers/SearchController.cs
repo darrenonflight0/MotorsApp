@@ -50,6 +50,11 @@ public class SearchController : ControllerBase
             query = query.Match(x => x.Country == searchParams.Country);
         }
 
+        if (!string.IsNullOrEmpty(searchParams.VehicleType))
+        {
+            query = query.Match(x => x.VehicleType == searchParams.VehicleType);
+        }
+
         query.PageNumber(searchParams.PageNumber);
         query.PageSize(searchParams.PageSize);
 

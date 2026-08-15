@@ -26,6 +26,8 @@ public class CreateAuctionDto
     [Required]
     public string Country {get; set;}
 
+    public string VehicleType {get; set;}
+
     // Uploaded photos as data URIs. The first is the cover (mirrored to ImageUrl).
     public List<string> Images {get; set;} = new();
 

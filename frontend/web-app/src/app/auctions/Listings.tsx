@@ -28,6 +28,7 @@ export default function Listings() {
       seller: state.seller,
       winner: state.winner,
       country: state.country,
+      vehicleType: state.vehicleType,
     }))
   );
   const setParams = useParamsStore((state) => state.setParams);

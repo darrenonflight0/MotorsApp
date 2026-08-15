@@ -25,6 +25,7 @@ export type Auction = {
   milage: number;
   imageUrl: string;
   country?: string;
+  vehicleType?: string;
   description?: string;
   images?: string[];
 };

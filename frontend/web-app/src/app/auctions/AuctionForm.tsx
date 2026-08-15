@@ -22,10 +22,17 @@ type AuctionFormValues = {
   reservePrice?: number | string;
   auctionEnd?: string;
   country?: string;
+  vehicleType?: string;
   description?: string;
 };
 
 const countries = ['Ghana', 'China', 'Japan', 'USA', 'Canada', 'South Africa'];
+// Must match the body-style labels on the home page (BrowseByType) so a listing
+// shows up under "What are you driving home?".
+const vehicleTypes = [
+  'Sedan', 'SUV', 'Coupe', 'Hatchback', 'Pickup', 'Convertible',
+  'Sports', 'Electric', 'Off-road', 'Van', 'Wagon', 'Motorcycle',
+];
 
 export default function AuctionForm({ auction }: Props) {
   const router = useRouter();
@@ -74,6 +81,7 @@ export default function AuctionForm({ auction }: Props) {
           milage: +data.milage,
           reservePrice: +(data.reservePrice ?? 0),
           country: data.country || 'Japan',
+          vehicleType: data.vehicleType || 'Sedan',
           auctionEnd: new Date(data.auctionEnd as string).toISOString(),
           images,
           imageUrl: images[0],
@@ -140,15 +148,27 @@ export default function AuctionForm({ auction }: Props) {
               </span>
             )}
           </div>
-          <div>
-            <label className="field-label">Source country</label>
-            <select {...register('country', { required: true })} className="field-input" defaultValue="Japan">
-              {countries.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="field-label">Source country</label>
+              <select {...register('country', { required: true })} className="field-input" defaultValue="Japan">
+                {countries.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="field-label">Vehicle type</label>
+              <select {...register('vehicleType', { required: true })} className="field-input" defaultValue="Sedan">
+                {vehicleTypes.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           <div>
             <label className="field-label">Condition &amp; known faults</label>

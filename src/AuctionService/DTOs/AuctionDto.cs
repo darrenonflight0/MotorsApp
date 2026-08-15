@@ -19,6 +19,7 @@ public class AuctionDto
     public int Milage {get; set;}
     public string ImageUrl {get; set;}
     public string Country {get; set;}
+    public string VehicleType {get; set;}
     public string Description {get; set;}
     public List<string> Images {get; set;} = new();
 }

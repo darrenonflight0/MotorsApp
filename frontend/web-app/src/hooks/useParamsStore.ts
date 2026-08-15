@@ -11,6 +11,7 @@ type State = {
   seller?: string;
   winner?: string;
   country?: string;
+  vehicleType?: string;
 };
 
 type Actions = {
@@ -30,6 +31,7 @@ const initialState: State = {
   seller: undefined,
   winner: undefined,
   country: undefined,
+  vehicleType: undefined,
 };
 
 export const useParamsStore = create<State & Actions>()((set) => ({

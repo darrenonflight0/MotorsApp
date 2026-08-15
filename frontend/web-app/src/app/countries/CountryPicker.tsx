@@ -32,7 +32,7 @@ export default function CountryPicker() {
   const selected = countries.find((c) => c.value === country);
 
   function pick(value: string) {
-    setParams({ country: value, filterBy: '', searchTerm: '' });
+    setParams({ country: value, filterBy: '', searchTerm: '', vehicleType: '' });
     document.getElementById('country-lots')?.scrollIntoView({ behavior: 'smooth' });
   }
 

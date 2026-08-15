@@ -162,7 +162,7 @@ export default function BrowseByBrand() {
   );
 
   function pick(query: string) {
-    setParams({ searchTerm: query, filterBy: '' });
+    setParams({ searchTerm: query, filterBy: '', vehicleType: '' });
     document.getElementById('lots')?.scrollIntoView({ behavior: 'smooth' });
   }
 

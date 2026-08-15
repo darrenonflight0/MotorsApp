@@ -12,4 +12,5 @@ public class SearchParams
     public string OrderBy {get; set;}
     public string FilterBy {get; set;}
     public string Country {get; set;}
+    public string VehicleType {get; set;}
 }
