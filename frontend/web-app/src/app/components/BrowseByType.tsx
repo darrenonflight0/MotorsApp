@@ -4,22 +4,22 @@ import { useParamsStore } from '@/hooks/useParamsStore';
 import { useShallow } from 'zustand/react/shallow';
 import FallbackImage from './FallbackImage';
 
-// Body styles with representative photography (LoremFlickr, open-license, locked
-// seed so each tile is stable). Selecting a type runs a search on the inventory.
+// Body styles with representative photography, self-hosted in /public/body-styles
+// (Wikimedia Commons, CC-licensed) so tiles don't depend on a flaky image API. Selecting a type runs a search on the inventory.
 // `type` must match the value stored on a listing (AuctionForm's vehicle types).
 const types = [
-  { label: 'Sedan', type: 'Sedan', img: 'sedan,car', lock: 12 },
-  { label: 'SUV', type: 'SUV', img: 'suv,car', lock: 21 },
-  { label: 'Coupe', type: 'Coupe', img: 'coupe,car', lock: 33 },
-  { label: 'Hatchback', type: 'Hatchback', img: 'hatchback,car', lock: 44 },
-  { label: 'Pickup', type: 'Pickup', img: 'pickup,truck', lock: 51 },
-  { label: 'Convertible', type: 'Convertible', img: 'convertible,car', lock: 66 },
-  { label: 'Sports', type: 'Sports', img: 'sportscar', lock: 77 },
-  { label: 'Electric', type: 'Electric', img: 'electric,car', lock: 88 },
-  { label: 'Off-road', type: 'Off-road', img: 'offroad,jeep', lock: 91 },
-  { label: 'Van', type: 'Van', img: 'van,vehicle', lock: 14 },
-  { label: 'Wagon', type: 'Wagon', img: 'stationwagon,car', lock: 27 },
-  { label: 'Motorcycle', type: 'Motorcycle', img: 'motorcycle', lock: 39 },
+  { label: 'Sedan', type: 'Sedan', img: '/body-styles/sedan.jpg' },
+  { label: 'SUV', type: 'SUV', img: '/body-styles/suv.jpg' },
+  { label: 'Coupe', type: 'Coupe', img: '/body-styles/coupe.jpg' },
+  { label: 'Hatchback', type: 'Hatchback', img: '/body-styles/hatchback.jpg' },
+  { label: 'Pickup', type: 'Pickup', img: '/body-styles/pickup.jpg' },
+  { label: 'Convertible', type: 'Convertible', img: '/body-styles/convertible.jpg' },
+  { label: 'Sports', type: 'Sports', img: '/body-styles/sports.jpg' },
+  { label: 'Electric', type: 'Electric', img: '/body-styles/electric.jpg' },
+  { label: 'Off-road', type: 'Off-road', img: '/body-styles/offroad.jpg' },
+  { label: 'Van', type: 'Van', img: '/body-styles/van.jpg' },
+  { label: 'Wagon', type: 'Wagon', img: '/body-styles/wagon.jpg' },
+  { label: 'Motorcycle', type: 'Motorcycle', img: '/body-styles/motorcycle.jpg' },
 ];
 
 export default function BrowseByType() {
@@ -58,7 +58,7 @@ export default function BrowseByType() {
               }`}
             >
               <FallbackImage
-                src={`https://loremflickr.com/400/300/${t.img}?lock=${t.lock}`}
+                src={t.img}
                 alt={`${t.label} vehicles`}
                 className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
               />
