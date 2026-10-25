@@ -7,49 +7,43 @@ export const metadata = {
   description: 'Step-by-step: register, deposit, bid, pay, and ship your vehicle with Yamkela Motors.',
 };
 
-// Each step carries a topical photo (LoremFlickr, locked seed) and a short
+// Each step carries a topical photo (self-hosted in /public/photos) and a short
 // picture description so buyers can see, not just read, what happens.
 const steps = [
   {
     title: 'Registration',
     body: 'Create a free account with a verified email. Add your full name and shipping country so we can tailor quotes. Google sign-in is supported.',
-    img: 'laptop',
-    lock: 3,
+    img: '/photos/laptop.jpg',
     caption: 'Sign up online in minutes from any device.',
   },
   {
     title: 'Deposit',
     body: 'Place a refundable security deposit before bidding on higher-value lots. It confirms you are a genuine buyer and is credited toward your purchase or refunded if you do not win.',
-    img: 'savings',
-    lock: 9,
+    img: '/photos/savings.jpg',
     caption: 'A refundable deposit unlocks bidding on premium lots.',
   },
   {
     title: 'Purchase process',
     body: 'Browse live lots, watch the countdown, and place bids. Winning bids are locked into a tamper-evident, signed ledger, so there is never a dispute about who bid what.',
-    img: 'cardealership',
-    lock: 15,
+    img: '/photos/dealership.jpg',
     caption: 'Bid in real time and watch the countdown on each lot.',
   },
   {
     title: 'Payment',
     body: 'Pay the winning amount into escrow. Funds are held by Yamkela and only released to the seller once you confirm the vehicle has been collected or delivered.',
-    img: 'creditcard',
-    lock: 22,
+    img: '/photos/creditcard.jpg',
     caption: 'Funds sit safely in escrow until you confirm delivery.',
   },
   {
     title: 'Transportation & shipping',
     body: 'Choose RoRo, container or air freight to your destination port. Our logistics desk books inland transport, ocean or air, insurance and documentation end to end.',
-    img: 'cargoship',
-    lock: 28,
+    img: '/photos/cargoship.jpg',
     caption: 'We book your car onto the vessel and track it to port.',
   },
   {
     title: 'Fees',
     body: 'A 7% buyer’s premium is added to your winning bid at checkout, plus shipping and any destination duties. Every charge is itemised up front with no hidden mark-ups.',
-    img: 'invoice',
-    lock: 35,
+    img: '/photos/invoice.jpg',
     caption: 'A 7% buyer’s premium applies, itemised up front.',
   },
 ];
@@ -95,7 +89,7 @@ export default function HowToBuyPage() {
             >
               <figure className="relative aspect-[16/9] w-full overflow-hidden bg-ink">
                 <FallbackImage
-                  src={`https://loremflickr.com/640/360/${s.img}?lock=${s.lock}`}
+                  src={s.img}
                   alt={s.title}
                   className="h-full w-full object-cover"
                 />

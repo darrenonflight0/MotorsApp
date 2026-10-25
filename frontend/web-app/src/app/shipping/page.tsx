@@ -7,30 +7,26 @@ export const metadata = {
   description: 'How Yamkela Motors moves your vehicle from auction to your destination port.',
 };
 
-// Topical photography from LoremFlickr (open-license, locked seed for stability).
+// Topical photography, self-hosted in /public/photos (Wikimedia Commons, CC-licensed).
 const services = [
   {
     name: 'Ground transportation',
-    img: 'carcarrier',
-    lock: 7,
+    img: '/photos/carcarrier.jpg',
     body: 'Inland haulage from the auction yard to the departure port on enclosed or open carriers, tracked at every handover.',
   },
   {
     name: 'RoRo (Roll-on/Roll-off)',
-    img: 'carferry',
-    lock: 18,
+    img: '/photos/carferry.jpg',
     body: 'The most economical ocean option. Drivable vehicles are rolled onto a dedicated car vessel and secured on deck.',
   },
   {
     name: 'Container',
-    img: 'shippingcontainer',
-    lock: 24,
+    img: '/photos/container.jpg',
     body: 'Shared or sole-use containers for extra protection, non-running vehicles, or when you want parts shipped alongside.',
   },
   {
     name: 'Air freight',
-    img: 'cargoplane',
-    lock: 31,
+    img: '/photos/cargoplane.jpg',
     body: 'Fastest door-to-port option for high-value or time-critical vehicles. Priced by weight and volume.',
   },
 ];
@@ -98,7 +94,7 @@ export default function ShippingPage() {
             >
               <div className="relative aspect-[16/9] w-full overflow-hidden bg-ink">
                 <FallbackImage
-                  src={`https://loremflickr.com/800/450/${s.img}?lock=${s.lock}`}
+                  src={s.img}
                   alt={s.name}
                   className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
                 />
