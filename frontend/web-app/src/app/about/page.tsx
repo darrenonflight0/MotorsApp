@@ -69,8 +69,8 @@ export default function AboutPage() {
         </div>
         <div className="aspect-[5/4] overflow-hidden rounded-xl border border-line/80 bg-ink shadow-lot">
           <FallbackImage
-            src="https://loremflickr.com/700/560/cars,port,shipping?lock=5"
-            alt="Vehicles staged at an export port"
+            src="/photos/port.jpg"
+            alt="An export port terminal"
             className="h-full w-full object-cover"
           />
         </div>
