@@ -71,12 +71,31 @@ export default function HelpPage() {
               Talk to the Yamkela team
             </h2>
             <p className="mt-2 max-w-xl text-sm text-chrome">
-              Email us and a real person replies. We never ask for your password or card details.
+              Email us at{' '}
+              <a href="mailto:yamkelamotors@gmail.com" className="font-semibold text-paper underline">
+                yamkelamotors@gmail.com
+              </a>{' '}
+              and a real person replies. We never ask for your password or card details.
             </p>
           </div>
-          <a href="mailto:support@yamkela.local" className="btn-primary shrink-0">
-            Email support
-          </a>
+          <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
+            <a
+              href="mailto:yamkelamotors@gmail.com?subject=Yamkela%20Motors%20support"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary"
+            >
+              Email support
+            </a>
+            <a
+              href="https://mail.google.com/mail/?view=cm&fs=1&to=yamkelamotors@gmail.com&su=Yamkela%20Motors%20support"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-chrome underline"
+            >
+              No mail app? Open in Gmail
+            </a>
+          </div>
         </div>
       </section>
     </div>
