@@ -1,7 +1,7 @@
 'use server';
 
 import { fetchWrapper } from '@/lib/fetchWrapper';
-import { Escrow } from '@/types';
+import { Escrow, EscrowMessage } from '@/types';
 
 type EscrowResult = Escrow | { error: { status: number; message: string } };
 
@@ -29,6 +29,23 @@ export async function confirmDelivery(auctionId: string): Promise<EscrowResult> 
 
 export async function disputeEscrow(auctionId: string): Promise<EscrowResult> {
   return await fetchWrapper.post(`escrow/${auctionId}/dispute`, {});
+}
+
+export async function postShipmentUpdate(
+  auctionId: string,
+  update: { stage: string; location?: string; trackingRef?: string; note?: string }
+): Promise<EscrowResult> {
+  return await fetchWrapper.post(`escrow/${auctionId}/shipment`, update);
+}
+
+type MessagesResult = EscrowMessage[] | { error: { status: number; message: string } };
+
+export async function getEscrowMessages(auctionId: string): Promise<MessagesResult> {
+  return await fetchWrapper.get(`escrow/${auctionId}/messages`);
+}
+
+export async function sendEscrowMessage(auctionId: string, text: string): Promise<MessagesResult> {
+  return await fetchWrapper.post(`escrow/${auctionId}/messages`, { text });
 }
 
 // ── Admin-only (backend enforces the Admin role) ──

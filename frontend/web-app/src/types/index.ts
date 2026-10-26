@@ -63,4 +63,27 @@ export type Escrow = {
   paymentProvider?: string;
   activeProvider?: string;
   fundsAreReal?: boolean;
+  shipment?: Shipment;
+};
+
+export type ShipmentStage = 'Preparing' | 'Collected' | 'AtPort' | 'Loaded' | 'InTransit' | 'Arrived';
+
+export type ShipmentUpdate = {
+  at: string;
+  by: string;
+  stage: ShipmentStage;
+  location?: string;
+  note?: string;
+};
+
+export type Shipment = {
+  stage: ShipmentStage;
+  trackingRef?: string;
+  updates: ShipmentUpdate[];
+};
+
+export type EscrowMessage = {
+  at: string;
+  from: string;
+  text: string;
 };

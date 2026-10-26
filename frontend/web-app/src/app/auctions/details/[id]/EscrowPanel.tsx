@@ -11,7 +11,9 @@ import { numberWithCommas } from '@/lib/format';
 import { Escrow } from '@/types';
 import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import EscrowMessages from './EscrowMessages';
 import PaystackDepositButton from './PaystackDepositButton';
+import ShipmentTracker from './ShipmentTracker';
 
 type Props = {
   auctionId: string;
@@ -64,6 +66,16 @@ export default function EscrowPanel({ auctionId, username }: Props) {
   }, [auctionId]);
 
   useEffect(load, [load]);
+
+  // Refresh when the other party posts a shipping update or the sale is funded.
+  useEffect(() => {
+    const onActivity = (e: Event) => {
+      const d = (e as CustomEvent).detail;
+      if (d?.auctionId === auctionId && d?.kind !== 'Message') load();
+    };
+    window.addEventListener('escrow-activity', onActivity);
+    return () => window.removeEventListener('escrow-activity', onActivity);
+  }, [auctionId, load]);
 
   async function run(action: (id: string) => Promise<Escrow | { error: { message: string } }>, ok: string) {
     setBusy(true);
@@ -135,6 +147,15 @@ export default function EscrowPanel({ auctionId, username }: Props) {
             </p>
           </div>
         )}
+
+        <ShipmentTracker escrow={escrow} canUpdate={isSeller} onChange={setEscrow} />
+
+        <EscrowMessages
+          auctionId={auctionId}
+          username={username}
+          counterparty={isBuyer ? escrow.seller : escrow.buyer}
+          open={escrow.status === 'Funded' || escrow.status === 'Disputed'}
+        />
 
         <div className="mt-4 flex flex-wrap gap-3">
           {isBuyer && escrow.status === 'AwaitingDeposit' && (

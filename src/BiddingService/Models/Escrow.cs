@@ -15,6 +15,35 @@ public enum EscrowStatus
     Defaulted,
 }
 
+/// <summary>Where the car is on its way to the buyer. Forward-only.</summary>
+public enum ShipmentStage
+{
+    Preparing,
+    Collected,
+    AtPort,
+    Loaded,
+    InTransit,
+    Arrived,
+}
+
+/// <summary>One entry in an escrow's shipment timeline.</summary>
+public class ShipmentUpdate
+{
+    public DateTime At { get; set; } = DateTime.UtcNow;
+    public string By { get; set; }
+    public ShipmentStage Stage { get; set; }
+    public string Location { get; set; }
+    public string Note { get; set; }
+}
+
+/// <summary>A message between the buyer and seller of an escrowed sale.</summary>
+public class EscrowMessage
+{
+    public DateTime At { get; set; } = DateTime.UtcNow;
+    public string From { get; set; }
+    public string Text { get; set; }
+}
+
 /// <summary>
 /// Escrow record for a sold auction. Funds are held by the platform
 /// (simulated in development) until the buyer confirms delivery or an
@@ -39,6 +68,14 @@ public class Escrow : Entity
     public string DepositReference { get; set; }       // captured deposit id (e.g. Stripe PaymentIntent)
     public string PayoutReference { get; set; }        // release/refund transaction id
     public string SellerPayoutAccount { get; set; }    // seller's connected-account id for payouts
+
+    // Delivery tracking, posted by the seller (or an admin) once funds are held.
+    public ShipmentStage ShipmentStage { get; set; } = ShipmentStage.Preparing;
+    public string TrackingRef { get; set; }            // vessel / waybill / container number
+    public List<ShipmentUpdate> ShipmentUpdates { get; set; } = new();
+
+    // Buyer <-> seller thread for this sale.
+    public List<EscrowMessage> Messages { get; set; } = new();
 
     public List<string> AuditTrail { get; set; } = new();
 
