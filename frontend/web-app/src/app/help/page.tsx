@@ -71,10 +71,14 @@ export default function HelpPage() {
               Talk to the Yamkela team
             </h2>
             <p className="mt-2 max-w-xl text-sm text-chrome">
-              Email us and a real person replies. We never ask for your password or card details.
+              Email us at{' '}
+              <a href="mailto:yamkelamotors@gmail.com" className="font-semibold text-paper underline">
+                yamkelamotors@gmail.com
+              </a>{' '}
+              and a real person replies. We never ask for your password or card details.
             </p>
           </div>
-          <a href="mailto:support@yamkela.local" className="btn-primary shrink-0">
+          <a href="mailto:yamkelamotors@gmail.com" className="btn-primary shrink-0">
             Email support
           </a>
         </div>
