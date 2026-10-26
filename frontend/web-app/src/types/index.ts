@@ -63,4 +63,38 @@ export type Escrow = {
   paymentProvider?: string;
   activeProvider?: string;
   fundsAreReal?: boolean;
+  shipment?: Shipment;
+};
+
+export type ShipmentStage = 'Preparing' | 'Collected' | 'AtPort' | 'Loaded' | 'InTransit' | 'Arrived';
+
+export type ShipmentUpdate = {
+  at: string;
+  by: string;
+  stage: ShipmentStage;
+  location?: string;
+  note?: string;
+};
+
+export type Shipment = {
+  stage: ShipmentStage;
+  trackingRef?: string;
+  updates: ShipmentUpdate[];
+};
+
+/** What the logistics team sees of a sale: no amounts or payment details. */
+export type LogisticsJob = {
+  id: string;
+  auctionId: string;
+  seller: string;
+  buyer: string;
+  status: Escrow['status'];
+  fundedAt?: string;
+  shipment: Shipment;
+};
+
+export type EscrowMessage = {
+  at: string;
+  from: string;
+  text: string;
 };

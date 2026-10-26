@@ -9,9 +9,10 @@ using Microsoft.EntityFrameworkCore;
 namespace IdentityService.Controllers;
 
 /// <summary>
-/// Admin-only management of who else is a platform admin. Grants/revokes the
-/// "Admin" role (an <c>AspNetUserRoles</c> row) with guard rails so an admin
-/// can't lock everyone out.
+/// Admin-only management of platform roles. Grants/revokes the "Admin" role (an
+/// <c>AspNetUserRoles</c> row) with guard rails so an admin can't lock everyone
+/// out, and the "Logistics" role held by the shipping partner's staff, who post
+/// shipment updates on escrowed sales.
 /// </summary>
 [ApiController]
 [Route("api/roles")]
@@ -39,11 +40,12 @@ public class RolesController : ControllerBase
             name,
             verified = u.IsVerified,
             isAdmin = await _userManager.IsInRoleAsync(u, "Admin"),
+            isLogistics = await _userManager.IsInRoleAsync(u, "Logistics"),
             profilePicture = u.ProfilePicture,
         };
     }
 
-    /// <summary>Empty query lists the current admins; a query searches all users
+    /// <summary>Empty query lists the current admins and logistics staff; a query searches all users
     /// by username (so you can find someone to promote).</summary>
     [HttpGet("users")]
     public async Task<IActionResult> Users([FromQuery] string? q)
@@ -54,6 +56,8 @@ public class RolesController : ControllerBase
         if (term.Length == 0)
         {
             users = (await _userManager.GetUsersInRoleAsync("Admin"))
+                .Concat(await _userManager.GetUsersInRoleAsync("Logistics"))
+                .DistinctBy(u => u.Id)
                 .OrderBy(u => u.UserName).ToList();
         }
         else
@@ -102,6 +106,34 @@ public class RolesController : ControllerBase
             await _userManager.RemoveFromRoleAsync(user, "Admin");
 
         _logger.LogWarning("SECURITY admin_revoked user={User} by={By}", user.UserName, CurrentUser);
+        return Ok(await ToDto(user));
+    }
+
+    /// <summary>Grant the Logistics role: lets the user post shipment updates.</summary>
+    [HttpPost("{username}/logistics")]
+    public async Task<IActionResult> GrantLogistics(string username)
+    {
+        var user = await _userManager.FindByNameAsync(username);
+        if (user == null) return NotFound();
+
+        if (!await _userManager.IsInRoleAsync(user, "Logistics"))
+            await _userManager.AddToRoleAsync(user, "Logistics");
+
+        _logger.LogWarning("SECURITY logistics_granted user={User} by={By}", user.UserName, CurrentUser);
+        return Ok(await ToDto(user));
+    }
+
+    /// <summary>Revoke the Logistics role.</summary>
+    [HttpDelete("{username}/logistics")]
+    public async Task<IActionResult> RevokeLogistics(string username)
+    {
+        var user = await _userManager.FindByNameAsync(username);
+        if (user == null) return NotFound();
+
+        if (await _userManager.IsInRoleAsync(user, "Logistics"))
+            await _userManager.RemoveFromRoleAsync(user, "Logistics");
+
+        _logger.LogWarning("SECURITY logistics_revoked user={User} by={By}", user.UserName, CurrentUser);
         return Ok(await ToDto(user));
     }
 }

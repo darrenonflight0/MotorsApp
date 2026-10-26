@@ -21,6 +21,7 @@ export default function UserActions({ user }: Props) {
   const setParams = useParamsStore((state) => state.setParams);
 
   const isAdmin = Array.isArray(user.role) ? user.role.includes('Admin') : user.role === 'Admin';
+  const isLogistics = Array.isArray(user.role) ? user.role.includes('Logistics') : user.role === 'Logistics';
 
   function setWinner() {
     setParams({ winner: user.username ?? undefined, seller: undefined });
@@ -64,6 +65,11 @@ export default function UserActions({ user }: Props) {
                 </Link>
                 <div className="my-1 border-t border-line/70" />
               </>
+            )}
+            {(isLogistics || isAdmin) && (
+              <Link href="/logistics" onClick={() => setOpen(false)} className="dropdown-item block">
+                <AiFillCar className="mr-2 inline" /> Logistics queue
+              </Link>
             )}
             {user.username && (
               <Link

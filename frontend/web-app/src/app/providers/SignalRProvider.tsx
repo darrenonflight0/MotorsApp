@@ -105,6 +105,21 @@ export default function SignalRProvider({ children }: Props) {
     );
 
     connection.current.on(
+      'EscrowActivity',
+      (a: { auctionId: string; recipient: string; kind: string; message: string }) => {
+        // Only the intended buyer/seller should hear about it.
+        if (!a.recipient || a.recipient !== usernameRef.current) return;
+        addNotification({
+          type: 'EscrowActivity',
+          message: a.message,
+          href: `/auctions/details/${a.auctionId}`,
+        });
+        toast(a.message, { duration: 6000 });
+        window.dispatchEvent(new CustomEvent('escrow-activity', { detail: a }));
+      }
+    );
+
+    connection.current.on(
       'Announcement',
       (a: { title?: string; message: string; href?: string }) => {
         addNotification({
@@ -123,6 +138,7 @@ export default function SignalRProvider({ children }: Props) {
       connection.current?.off('AuctionEndExtended');
       connection.current?.off('AuctionFinished');
       connection.current?.off('SecondChanceOffered');
+      connection.current?.off('EscrowActivity');
       connection.current?.off('Announcement');
     };
   }, [setCurrentPrice, addBid, addNotification, pushActivity]);
