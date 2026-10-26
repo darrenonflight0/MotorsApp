@@ -35,7 +35,7 @@ public class DbInitializer
         context.Database.Migrate();
 
         // Roles are required regardless of whether users already exist.
-        foreach (var role in new[] { "Admin", "User" })
+        foreach (var role in new[] { "Admin", "User", "Logistics" })
         {
             if (!roleManager.RoleExistsAsync(role).Result)
                 roleManager.CreateAsync(new IdentityRole(role)).Wait();

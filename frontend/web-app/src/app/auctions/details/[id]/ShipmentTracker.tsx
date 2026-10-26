@@ -1,7 +1,7 @@
 'use client';
 
 import { postShipmentUpdate } from '@/app/actions/escrowActions';
-import { Escrow, ShipmentStage } from '@/types';
+import { Escrow, LogisticsJob, ShipmentStage } from '@/types';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 
@@ -15,9 +15,11 @@ const STAGES: { value: ShipmentStage; label: string }[] = [
 ];
 
 type Props = {
-  escrow: Escrow;
+  // Only the fields the tracker needs, so it works for both the buyer/seller
+  // escrow view and the amount-free logistics view.
+  escrow: Pick<Escrow, 'auctionId' | 'status' | 'shipment'>;
   canUpdate: boolean;
-  onChange: (e: Escrow) => void;
+  onChange?: (e: LogisticsJob) => void;
 };
 
 function fmt(iso: string) {
@@ -45,7 +47,7 @@ export default function ShipmentTracker({ escrow, canUpdate, onChange }: Props) 
         note: note.trim() || undefined,
       });
       if ('error' in res) throw new Error(res.error.message);
-      onChange(res);
+      onChange?.(res);
       setLocation('');
       setNote('');
       toast.success('Shipping update sent to the buyer');
@@ -101,8 +103,8 @@ export default function ShipmentTracker({ escrow, canUpdate, onChange }: Props) 
       ) : (
         <p className="mt-3 text-sm text-muted">
           {canUpdate
-            ? 'Post the first update so the buyer knows where the car is.'
-            : 'The seller hasn’t posted a shipping update yet. You’ll be notified when they do.'}
+            ? 'No updates yet. Post the first one once the car is collected.'
+            : 'Our logistics partner will collect the car and post updates here. You’ll be notified when they do.'}
         </p>
       )}
 

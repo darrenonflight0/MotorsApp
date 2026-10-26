@@ -1,7 +1,7 @@
 'use server';
 
 import { fetchWrapper } from '@/lib/fetchWrapper';
-import { Escrow, EscrowMessage } from '@/types';
+import { Escrow, EscrowMessage, LogisticsJob } from '@/types';
 
 type EscrowResult = Escrow | { error: { status: number; message: string } };
 
@@ -31,10 +31,17 @@ export async function disputeEscrow(auctionId: string): Promise<EscrowResult> {
   return await fetchWrapper.post(`escrow/${auctionId}/dispute`, {});
 }
 
+type JobResult = LogisticsJob | { error: { status: number; message: string } };
+
+// Logistics team / admin only (backend enforces the role).
+export async function getLogisticsJobs(): Promise<LogisticsJob[] | { error: unknown }> {
+  return await fetchWrapper.get('escrow/logistics/jobs');
+}
+
 export async function postShipmentUpdate(
   auctionId: string,
   update: { stage: string; location?: string; trackingRef?: string; note?: string }
-): Promise<EscrowResult> {
+): Promise<JobResult> {
   return await fetchWrapper.post(`escrow/${auctionId}/shipment`, update);
 }
 

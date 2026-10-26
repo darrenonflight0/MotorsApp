@@ -31,6 +31,7 @@ public class EscrowController : ControllerBase
 
     private string Username => User.Identity!.Name;
     private bool IsAdmin => User.IsInRole("Admin");
+    private bool IsLogistics => User.IsInRole("Logistics");
 
     private object ToDto(Escrow e)
     {
@@ -69,6 +70,26 @@ public class EscrowController : ControllerBase
         };
     }
 
+    // What the logistics team sees of a sale: parties, status and shipment only,
+    // never amounts or payment details.
+    private static object JobDto(Escrow e) => new
+    {
+        id = e.ID,
+        auctionId = e.AuctionId,
+        seller = e.Seller,
+        buyer = e.Buyer,
+        status = e.Status.ToString(),
+        fundedAt = e.FundedAt,
+        shipment = new
+        {
+            stage = e.ShipmentStage.ToString(),
+            trackingRef = e.TrackingRef,
+            updates = e.ShipmentUpdates
+                .OrderByDescending(u => u.At)
+                .Select(u => new { at = u.At, by = u.By, stage = u.Stage.ToString(), location = u.Location, note = u.Note }),
+        },
+    };
+
     [HttpGet("{auctionId}")]
     public async Task<ActionResult> GetForAuction(string auctionId)
     {
@@ -98,6 +119,22 @@ public class EscrowController : ControllerBase
             .ExecuteAsync();
 
         return Ok(escrows.Select(ToDto));
+    }
+
+    /// <summary>
+    /// Logistics queue: paid sales whose car hasn't arrived yet. Deliberately
+    /// carries no amounts or payment details; only what's needed to run pickup.
+    /// </summary>
+    [Authorize(Roles = "Logistics,Admin")]
+    [HttpGet("logistics/jobs")]
+    public async Task<ActionResult> LogisticsJobs()
+    {
+        var escrows = await DB.Find<Escrow>()
+            .Match(e => e.Status == EscrowStatus.Funded && e.ShipmentStage != ShipmentStage.Arrived)
+            .Sort(b => b.Ascending(e => e.FundedAt))
+            .ExecuteAsync();
+
+        return Ok(escrows.Select(JobDto));
     }
 
     /// <summary>Admin: every disputed escrow awaiting resolution.</summary>
@@ -167,8 +204,8 @@ public class EscrowController : ControllerBase
         // bid deposit is no longer needed — return it.
         await RefundBidDeposit(auctionId, escrow.Buyer);
 
-        await Notify(auctionId, escrow.Buyer, "Funded", "Payment received. Your funds are held in escrow; the seller will post shipping updates here.");
-        await Notify(auctionId, escrow.Seller, "Funded", "The buyer has paid into escrow. Prepare the car and post a shipping update.");
+        await Notify(auctionId, escrow.Buyer, "Funded", "Payment received. Your funds are held in escrow; our logistics partner will collect the car and post shipping updates here.");
+        await Notify(auctionId, escrow.Seller, "Funded", "The buyer has paid into escrow. Our logistics partner will arrange collection of the car; you'll see shipping updates here.");
 
         _logger.LogInformation("SECURITY escrow_funded auction={Auction} buyer={Buyer} amount={Amount} provider={Provider}",
             auctionId, Username, escrow.Amount, _payments.Name);
@@ -281,9 +318,10 @@ public class EscrowController : ControllerBase
     public record ShipmentUpdateDto(string Stage, string Location, string TrackingRef, string Note);
 
     /// <summary>
-    /// Seller (or an admin) posts a shipping update on a funded escrow: the stage
-    /// moves forward only, with the car's current location and an optional
-    /// tracking reference. The buyer is notified.
+    /// The logistics partner (or an admin) posts a shipping update on a funded
+    /// escrow: the stage moves forward only, with the car's current location and
+    /// an optional tracking reference. Sellers collect nothing and ship nothing
+    /// themselves, so they cannot post updates; the buyer and seller are notified.
     /// </summary>
     [HttpPost("{auctionId}/shipment")]
     public async Task<ActionResult> PostShipment(string auctionId, [FromBody] ShipmentUpdateDto dto)
@@ -291,7 +329,7 @@ public class EscrowController : ControllerBase
         var escrow = await FindEscrow(auctionId);
         if (escrow == null) return NotFound();
 
-        if (escrow.Seller != Username && !IsAdmin)
+        if (!IsLogistics && !IsAdmin)
         {
             _logger.LogWarning("SECURITY shipment_update_denied user={User} auction={Auction}", Username, auctionId);
             return Forbid();
@@ -320,9 +358,10 @@ public class EscrowController : ControllerBase
 
         var where = string.IsNullOrEmpty(location) ? "" : $" ({location})";
         await Notify(auctionId, escrow.Buyer, "Shipment", $"Shipping update: {StageLabel(stage)}{where}");
+        await Notify(auctionId, escrow.Seller, "Shipment", $"Shipping update on your sold car: {StageLabel(stage)}{where}");
 
         _logger.LogInformation("SHIPMENT update auction={Auction} stage={Stage} by={User}", auctionId, stage, Username);
-        return Ok(ToDto(escrow));
+        return Ok(JobDto(escrow));
     }
 
     /// <summary>The buyer/seller message thread for a sale (parties and admins only).</summary>

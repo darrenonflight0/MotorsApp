@@ -148,7 +148,7 @@ export default function EscrowPanel({ auctionId, username }: Props) {
           </div>
         )}
 
-        <ShipmentTracker escrow={escrow} canUpdate={isSeller} onChange={setEscrow} />
+        <ShipmentTracker escrow={escrow} canUpdate={false} />
 
         <EscrowMessages
           auctionId={auctionId}

@@ -7,6 +7,7 @@ export type ManagedUser = {
   name: string;
   verified: boolean;
   isAdmin: boolean;
+  isLogistics: boolean;
   profilePicture?: string | null;
 };
 
@@ -24,4 +25,12 @@ export async function grantAdmin(username: string): Promise<ManagedUser | Err> {
 
 export async function revokeAdmin(username: string): Promise<ManagedUser | Err> {
   return fetchWrapper.del(`roles/${encodeURIComponent(username)}/admin`);
+}
+
+export async function grantLogistics(username: string): Promise<ManagedUser | Err> {
+  return fetchWrapper.post(`roles/${encodeURIComponent(username)}/logistics`, {});
+}
+
+export async function revokeLogistics(username: string): Promise<ManagedUser | Err> {
+  return fetchWrapper.del(`roles/${encodeURIComponent(username)}/logistics`);
 }

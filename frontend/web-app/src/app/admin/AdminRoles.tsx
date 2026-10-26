@@ -1,6 +1,13 @@
 'use client';
 
-import { grantAdmin, listUsers, ManagedUser, revokeAdmin } from '@/app/actions/adminActions';
+import {
+  grantAdmin,
+  grantLogistics,
+  listUsers,
+  ManagedUser,
+  revokeAdmin,
+  revokeLogistics,
+} from '@/app/actions/adminActions';
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -42,6 +49,22 @@ export default function AdminRoles({ initial }: { initial: ManagedUser[] }) {
     }
   }
 
+  async function toggleLogistics(u: ManagedUser) {
+    setBusy(`${u.username}:logistics`);
+    try {
+      const res = u.isLogistics ? await revokeLogistics(u.username) : await grantLogistics(u.username);
+      if ('error' in res) throw new Error(res.error.message);
+      setUsers((list) => list.map((x) => (x.username === u.username ? { ...x, isLogistics: res.isLogistics } : x)));
+      toast.success(
+        res.isLogistics ? `${u.username} can now post shipment updates` : `Removed logistics access from ${u.username}`
+      );
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Could not update logistics access');
+    } finally {
+      setBusy(null);
+    }
+  }
+
   return (
     <section>
       <span className="eyebrow">Access control</span>
@@ -50,8 +73,9 @@ export default function AdminRoles({ initial }: { initial: ManagedUser[] }) {
         Admin access
       </h2>
       <p className="mb-4 text-sm text-muted">
-        Search a registered user to grant admin, or remove access below. Changes take effect the next
-        time that person signs in.
+        Search a registered user to grant admin or logistics access, or remove it below. Logistics staff
+        (our shipping partner) post shipment updates on paid sales. Changes take effect the next time
+        that person signs in.
       </p>
 
       <div className="mb-4 flex h-11 max-w-md items-center rounded-full border border-line/40 bg-surface px-4 focus-within:border-redline">
@@ -69,7 +93,7 @@ export default function AdminRoles({ initial }: { initial: ManagedUser[] }) {
           <div className="px-4 py-8 text-center text-sm text-muted">Loading…</div>
         ) : users.length === 0 ? (
           <div className="px-4 py-8 text-center text-sm text-muted">
-            {query.trim() ? `No users found for “${query.trim()}”.` : 'No admins yet.'}
+            {query.trim() ? `No users found for “${query.trim()}”.` : 'No admins or logistics staff yet.'}
           </div>
         ) : (
           <ul className="divide-y divide-line/60">
@@ -100,9 +124,21 @@ export default function AdminRoles({ initial }: { initial: ManagedUser[] }) {
                           Admin
                         </span>
                       )}
+                      {u.isLogistics && (
+                        <span className="rounded-full bg-racing/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-racing">
+                          Logistics
+                        </span>
+                      )}
                     </div>
                     <div className="truncate text-xs text-muted">{u.name}</div>
                   </div>
+                  <button
+                    disabled={busy === `${u.username}:logistics`}
+                    onClick={() => toggleLogistics(u)}
+                    className="shrink-0 rounded-lg border border-line/60 px-3 py-2 font-display text-xs font-bold uppercase tracking-wide text-fg transition-colors hover:bg-ink hover:text-paper disabled:opacity-50"
+                  >
+                    {busy === `${u.username}:logistics` ? '…' : u.isLogistics ? 'Remove logistics' : 'Make logistics'}
+                  </button>
                   <button
                     disabled={busy === u.username}
                     onClick={() => toggle(u)}
